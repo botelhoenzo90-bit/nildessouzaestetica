@@ -83,7 +83,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Nildes Souza Estética" },
       { property: "og:description", content: "Beleza, estética e bem-estar no Imbuí, em Salvador." },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://nildessouzaestetica.lovable.app/favicon.png" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://nildessouzaestetica.lovable.app/favicon.png" },
           ],
     links: [
       {

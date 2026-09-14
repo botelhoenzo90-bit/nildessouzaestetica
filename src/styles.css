@@ -1,6 +1,10 @@
 @import "tailwindcss" source(none);
 @source "../src";
 
+#lovable-badge {
+  display: none !important;
+}
+
 :root{--r950:#5d1d32;--r900:#76243f;--r800:#963653;--r700:#b34d6b;--r600:#c96582;--r300:#efb6c4;--r200:#f5d4dc;--r100:#fbedf0;--cream:#fffaf8;--paper:#fffdfc;--ink:#35252b;--muted:#76666c;--line:#ead9de;--shadow:0 18px 55px rgba(93,29,50,.12);--pad:clamp(18px,5vw,82px);--max:1180px}
 *{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{margin:0;background:var(--cream);color:var(--ink);font-family:"Segoe UI",Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}h1,h2,h3{margin:0;font-family:Georgia,"Times New Roman",serif;line-height:1.08}p{margin:0}.ns-page{min-height:100vh;overflow-x:clip}.ns-container{width:min(var(--max),calc(100% - 2 * var(--pad)));margin:auto}
 .ns-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:52px;padding:0 23px;border:1px solid var(--r800);border-radius:999px;background:var(--r800);color:#fff;font-size:13px;font-weight:800;box-shadow:0 13px 30px rgba(150,54,83,.22);transition:.2s}.ns-btn:hover{transform:translateY(-2px);background:var(--r900)}.ns-btn-light{background:rgba(255,255,255,.8);color:var(--r900);border-color:rgba(118,36,63,.2)}.ns-eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--r800);font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase}.ns-section{padding:clamp(72px,9vw,115px) 0}.ns-section-title{max-width:760px;margin:0 auto 46px;display:grid;justify-items:center;gap:13px;text-align:center}.ns-section-title h2{color:var(--r950);font-size:clamp(34px,4vw,53px);letter-spacing:-1.3px}.ns-section-title h2 em,h2 em{color:var(--r700);font-style:italic;font-weight:400}.ns-section-title p{max-width:640px;color:var(--muted);font-size:14px}.center-cta{display:flex;justify-content:center;margin-top:34px}
@@ -43,3 +47,65 @@
 .ns-footer .ns-brand{justify-content:flex-start}.ns-footer .ns-brand img{width:245px;filter:brightness(0) invert(1);opacity:.92}
 @media (max-width:900px){.booking-intro{grid-template-columns:1fr}.time-grid{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:620px){.ns-brand img{width:min(290px,88vw)}.form-grid{grid-template-columns:1fr}.time-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* Acabamento móvel */
+.how-step-highlight{background:rgba(255,255,255,.88);border-color:rgba(150,54,83,.13)}
+.ns-experience .experience-box{grid-template-columns:minmax(0,720px);justify-content:center}
+.experience-copy{min-width:0}
+@media (max-width:900px){
+  :root{--pad:clamp(20px,6vw,42px)}
+  .about-grid,.why-grid,.location-grid,.faq-grid,.footer-grid{grid-template-columns:1fr}
+  .about-grid,.location-grid,.faq-grid{gap:38px}
+  .why-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .footer-grid{gap:34px}
+  .about-copy,.location-copy,.booking-heading,.opening-hours,.booking-form,.faq-grid>div{min-width:0}
+  .about-photo-wrap{min-height:480px}
+  .about-photo{height:480px}
+  .map-frame,.map-frame iframe{min-height:360px;height:360px}
+}
+@media (max-width:620px){
+  :root{--pad:20px}
+  .ns-container{width:calc(100% - 40px)}
+  .ns-section{padding:60px 0}
+  .ns-section-title{gap:11px;margin-bottom:30px}
+  .ns-section-title h2,.about-copy h2,.location-copy h2,.booking-heading h2{font-size:36px;letter-spacing:0;overflow-wrap:anywhere}
+  .ns-section-title p,.about-copy>p,.experience-copy>p,.location-copy>p,.booking-heading>p{font-size:13px;line-height:1.7}
+  .hero-inner{min-height:650px;padding:42px 0 46px}
+  .hero-inner h1{font-size:48px;letter-spacing:0;overflow-wrap:anywhere}
+  .hero-inner>p{font-size:14px;line-height:1.65}
+  .hero-mini-points{gap:10px 16px}
+  .how-step{padding:24px;min-width:0}
+  .about-grid{gap:34px}
+  .about-photo-wrap{min-height:390px;align-items:stretch}
+  .about-photo-glow{width:280px;height:280px}
+  .about-photo{width:100%;height:390px;border-width:7px;border-radius:170px 170px 24px 24px;object-position:center 18%}
+  .about-badge{left:10px;bottom:18px;max-width:calc(100% - 20px)}
+  .about-copy{text-align:left}
+  .about-actions{gap:12px}
+  .procedure-card{width:min(285px,calc(100vw - 54px))}
+  .procedure-body{min-height:205px;padding:21px}
+  .experience-copy h2{font-size:38px;letter-spacing:0;overflow-wrap:anywhere}
+  .experience-points>div{grid-template-columns:38px minmax(0,1fr)}
+  .experience-points p{min-width:0}
+  .experience-copy .ns-btn{width:100%}
+  .why-grid{grid-template-columns:1fr}
+  .why-grid article{min-height:0;padding:27px 22px}
+  .review-card{width:min(310px,calc(100vw - 54px));min-height:260px}
+  .location-detail{align-items:flex-start;min-width:0}
+  .location-detail>div{min-width:0}
+  .location-detail span{overflow-wrap:anywhere}
+  .map-frame{min-height:310px;height:310px;border-width:6px;border-radius:24px}.map-frame iframe{min-height:310px;height:310px}
+  .faq-grid .ns-section-title{margin-bottom:22px}
+  .faq-grid>div:first-child>.ns-btn{width:100%}
+  .faq-item>button{min-height:68px;gap:12px;font-size:15px}.faq-item>button span{min-width:0}.faq-item>button svg{flex-shrink:0}
+  .booking-shell{width:calc(100% - 24px);padding:28px 16px;border-radius:24px}
+  .booking-form{padding:18px 14px;border-radius:20px}
+  .opening-hours{padding:18px 15px}
+  .opening-hours-list>div{gap:10px}.opening-hours-list>div span{min-width:0}.opening-hours-list b{flex-shrink:0}
+  .time-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .booking-submit{padding:0 12px}
+  .ns-final-cta{padding:68px 0}.final-inner h2{font-size:39px;letter-spacing:0;overflow-wrap:anywhere}
+  .footer-grid{padding:48px 0 38px}.ns-footer .ns-brand img{width:min(245px,80vw)}
+  .footer-grid a{max-width:100%;overflow-wrap:anywhere}
+  .footer-bottom{gap:16px;align-items:flex-start;padding:18px 0;flex-direction:column}
+}
