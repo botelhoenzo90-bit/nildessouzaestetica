@@ -1,48 +1,36 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Children, useState, type ReactNode } from "react";
 import {
-  Activity, Baby, CalendarDays, ChevronDown, ClipboardList, Clock3, Cross,
-  Droplets, FileText, Heart, HeartPulse, Instagram, MapPin, Menu, Microscope,
-  Navigation, Phone, ShieldCheck, Stethoscope, Users, X, Sparkles,
-  CheckCircle2, ArrowUpRight
+  ArrowRight,
+  ArrowUpRight,
+  CalendarDays,
+  Check,
+  ChevronDown,
+  Clock3,
+  Heart,
+  Instagram,
+  MapPin,
+  Menu,
+  MessageCircle,
+  Sparkles,
+  Star,
+  X,
 } from "lucide-react";
-
-import logoAsset from "@/assets/logo-prosaude.png.asset.json";
-import waIcon from "@/assets/wa-icon.png.asset.json";
-import heroImg from "@/assets/hero.jpg";
-import childImg from "@/assets/child.jpg";
-import clinicImg from "@/assets/clinic.jpg";
-
-import espCardio from "@/assets/esp-cardiologia.jpg";
-import espGineco from "@/assets/esp-ginecologia.jpg";
-import espUro from "@/assets/esp-urologia.jpg";
-import espOrto from "@/assets/esp-ortopedia.jpg";
-import espNeuro from "@/assets/esp-neurologia.jpg";
-import espNutri from "@/assets/esp-nutricao.jpg";
-import espClinico from "@/assets/esp-clinico.jpg";
-
-import exLab from "@/assets/ex-laboratorio.jpg";
-import exUltra from "@/assets/ex-ultrassom.jpg";
-import exEcg from "@/assets/ex-ecg.jpg";
-import exMapa from "@/assets/ex-mapa.jpg";
-import exHolter from "@/assets/ex-holter.jpg";
-import exEspiro from "@/assets/ex-espirometria.jpg";
-import exErgo from "@/assets/ex-ergometrico.jpg";
 
 export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Clínica Médica Pró-Saúde | Consultas e Exames em Macururé - BA" },
+      { title: "Nildes Souza Estética | Beleza, Cuidado e Bem-Estar" },
       {
         name: "description",
         content:
-          "Consultas, exames e coleta laboratorial em Macururé - BA. Cardiologia, ginecologia, pediatria e mais, com atendimento humanizado para toda a família.",
+          "Nildes Souza Estética: auriculoterapia, design de sobrancelhas, limpeza de pele, peeling, ventosaterapia e massagem relaxante no Imbuí, Salvador - BA.",
       },
-      { property: "og:title", content: "Clínica Médica Pró-Saúde | Macururé - BA" },
+      { property: "og:title", content: "Nildes Souza Estética | Beleza, Cuidado e Bem-Estar" },
       {
         property: "og:description",
-        content: "Consultas, exames e coleta laboratorial em um só lugar, com atendimento humanizado.",
+        content: "Tudo o que você precisa para realçar sua beleza, cuidar de você e viver momentos de bem-estar.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -51,127 +39,130 @@ export const Route = createFileRoute("/")({
 });
 
 const wa =
-  "https://wa.me/557597018423?text=Ol%C3%A1!%20Quero%20agendar%20um%20atendimento%20na%20Cl%C3%ADnica%20M%C3%A9dica%20Pr%C3%B3-Sa%C3%BAde.";
-const mapUrl = "https://www.google.com/maps/search/?api=1&query=Clinica+Medica+Pro-Saude+Macurure+BA";
+  "https://wa.me/5571981294334?text=Ol%C3%A1!%20Quero%20agendar%20um%20hor%C3%A1rio%20na%20Nildes%20Souza%20Est%C3%A9tica.";
+const mapUrl =
+  "https://www.google.com/maps/search/?api=1&query=Rua+das+Gaivotas+196+Imbui+Center+Sala+101+Salvador+BA";
+const instagramUrl = "https://instagram.com/nildes.estetica";
 
 const navLinks: [string, string][] = [
   ["Início", "#inicio"],
-  ["A Clínica", "#a-clinica"],
-  ["Especialidades", "#especialidades"],
-  ["Exames", "#exames"],
-  ["Atendimento Infantil", "#atendimento-infantil"],
+  ["Sobre", "#sobre"],
+  ["Procedimentos", "#procedimentos"],
+  ["Experiência", "#experiencia"],
   ["Dúvidas", "#duvidas"],
-  ["Contato", "#contato"],
+  ["Agendamento", "#agendamento"],
 ];
 
-const specialties = [
-  [HeartPulse, "Cardiologia", "Cuidado cardiovascular, prevenção e acompanhamento para manter seu coração saudável.", espCardio],
-  [Baby, "Ginecologia", "Saúde feminina com acolhimento e acompanhamento em todas as fases da vida.", espGineco],
-  [Activity, "Urologia", "Prevenção, diagnóstico e cuidado completo para a saúde urinária e masculina.", espUro],
-  [Cross, "Ortopedia", "Mais movimento e qualidade de vida com avaliação e cuidado especializado.", espOrto],
-  [Microscope, "Neurologia", "Atenção à saúde do cérebro, memória, equilíbrio e sistema nervoso.", espNeuro],
-  [Droplets, "Nutrição", "Orientação alimentar individualizada para mais saúde, energia e bem-estar.", espNutri],
-  [Stethoscope, "Clínico Geral", "Atendimento completo para prevenção, avaliação e cuidado em todas as idades.", espClinico],
-] as const;
-
-const exams = [
-  [FileText, "Exames Laboratoriais", "Coleta segura e prática para diferentes tipos de exames.", exLab],
-  [Microscope, "Ultrassonografia", "Imagens precisas para auxiliar na investigação e no diagnóstico.", exUltra],
-  [Activity, "Eletrocardiograma", "Avaliação da atividade elétrica e do ritmo do coração.", exEcg],
-  [Navigation, "MAPA", "Monitoramento da pressão arterial durante 24 horas.", exMapa],
-  [Clock3, "Holter", "Acompanhamento contínuo do ritmo cardíaco ao longo do dia.", exHolter],
-  [Droplets, "Espirometria", "Avaliação da capacidade e função respiratória.", exEspiro],
-  [Activity, "Teste Ergométrico", "Avaliação cardiovascular durante esforço físico controlado.", exErgo],
+const procedures = [
+  {
+    name: "Limpeza de Pele",
+    eyebrow: "Pele renovada",
+    text: "Um cuidado completo para deixar a pele mais limpa, leve e com aparência saudável.",
+    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1000&q=88",
+  },
+  {
+    name: "Design de Sobrancelhas",
+    eyebrow: "Olhar em destaque",
+    text: "Valorize seus traços com um design pensado para harmonizar o seu olhar.",
+    image: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=1000&q=88",
+  },
+  {
+    name: "Massagem Relaxante",
+    eyebrow: "Pausa para você",
+    text: "Um momento de relaxamento para desacelerar, aliviar tensões e cuidar do bem-estar.",
+    image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1000&q=88",
+  },
+  {
+    name: "Ventosaterapia",
+    eyebrow: "Cuidado corporal",
+    text: "Uma experiência de cuidado que complementa sua rotina de bem-estar e relaxamento.",
+    image: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=1000&q=88",
+  },
+  {
+    name: "Peeling",
+    eyebrow: "Renovação da pele",
+    text: "Cuidado estético para promover renovação e deixar a pele com aspecto mais uniforme.",
+    image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b0?auto=format&fit=crop&w=1000&q=88",
+  },
+  {
+    name: "Auriculoterapia",
+    eyebrow: "Equilíbrio e cuidado",
+    text: "Uma prática de cuidado complementar para quem busca uma pausa de atenção ao corpo e à mente.",
+    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1000&q=88",
+  },
 ] as const;
 
 const reviews = [
-  ["Mariana Silva", "Atendimento excelente! Profissionais muito atenciosos, ambiente acolhedor e tudo muito organizado."],
-  ["Carlos Mendes", "Realizei meus exames e fui muito bem atendido. Equipe preparada e resultado com muita agilidade."],
-  ["Ana Paula", "Levei minha filha e fiquei encantada com o cuidado de toda a equipe. Atendimento humano de verdade!"],
-  ["João Oliveira", "Clínica muito bem estruturada. Desde a recepção até o atendimento médico, tudo excelente."],
-  ["Fernanda Alves", "Profissionais educados, ambiente confortável e atendimento que transmite confiança."],
+  ["Mariana", "Um atendimento acolhedor e um espaço muito bonito. Saí me sentindo ainda melhor."],
+  ["Camila", "Amei o cuidado em cada detalhe. Foi uma experiência leve, tranquila e especial."],
+  ["Juliana", "O atendimento foi maravilhoso. Já quero voltar para conhecer outros procedimentos."],
+  ["Patrícia", "Ambiente agradável, atendimento atencioso e muito carinho durante todo o procedimento."],
 ] as const;
 
 const faqs = [
-  "Precisa estar em jejum para fazer exames laboratoriais?",
-  "Qual o prazo para entrega dos resultados?",
-  "Crianças também podem realizar exames?",
-  "Como posso agendar uma consulta?",
-  "Quais formas de pagamento são aceitas?",
+  "Preciso agendar antes de ir?",
+  "Onde fica a Nildes Souza Estética?",
+  "Quais procedimentos estão disponíveis?",
+  "Como funciona o agendamento online?",
+  "Posso agendar mais de um procedimento?",
+  "Como entro em contato pelo WhatsApp?",
 ];
 
 function Button({
-  children = "Agendar pelo WhatsApp",
-  href = wa,
+  children = "Agendar meu horário",
+  href = "#agendamento",
   light = false,
-  icon = true,
+  whatsapp = false,
 }: {
   children?: ReactNode;
   href?: string;
   light?: boolean;
-  icon?: boolean;
+  whatsapp?: boolean;
 }) {
   const external = href.startsWith("http");
   return (
     <a
-      className={`ps-btn ${light ? "ps-btn-light" : ""}`}
+      className={`ns-btn ${light ? "ns-btn-light" : ""}`}
       href={href}
       {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
     >
-      {icon && external && <Phone size={16} />}
+      {whatsapp && <MessageCircle size={17} />}
       {children}
-      {!external && <ArrowUpRight size={16} />}
+      {!whatsapp && <ArrowUpRight size={16} />}
     </a>
   );
 }
 
 function SectionTitle({ eyebrow, title, sub }: { eyebrow: string; title: string; sub: string }) {
   return (
-    <div className="ps-section-title">
-      <span className="section-eyebrow">
-        <Sparkles size={13} />
-        {eyebrow}
-      </span>
+    <div className="ns-section-title">
+      <span className="ns-eyebrow"><Sparkles size={14} /> {eyebrow}</span>
       <h2>{title}</h2>
       <p>{sub}</p>
     </div>
   );
 }
 
-function Logo({ small = false }: { small?: boolean }) {
+function Brand({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`ps-logo ${small ? "small" : ""}`}>
-      <img className="logo-img" src={logoAsset.url} alt="Logo da Clínica Médica Pró-Saúde" />
-      <div>
-        <strong>PRÓ-SAÚDE</strong>
-        <small>CLÍNICA MÉDICA</small>
+    <div className={`ns-brand ${compact ? "compact" : ""}`} aria-label="Nildes Souza Estética">
+      <div className="brand-symbol">NS</div>
+      <div className="brand-name">
+        <strong>NILDES SOUZA</strong>
+        <span>ESTÉTICA</span>
       </div>
     </div>
   );
 }
 
-/** Carrossel automático estilo esteira (loop contínuo, pausa ao passar o mouse). */
-function Marquee({
-  children,
-  label,
-  duration = 44,
-}: {
-  children: ReactNode;
-  label: string;
-  duration?: number;
-}) {
+function Marquee({ children, label, duration = 34 }: { children: ReactNode; label: string; duration?: number }) {
   const items = Children.toArray(children);
   return (
-    <div className="marquee" role="group" aria-label={label}>
-      <div
-        className="marquee-track"
-        style={{ ["--marquee-duration" as string]: `${duration}s` }}
-      >
+    <div className="ns-marquee" role="group" aria-label={label}>
+      <div className="ns-marquee-track" style={{ ["--marquee-duration" as string]: `${duration}s` }}>
         {items}
         {items.map((item, i) => (
-          <div key={`clone-${i}`} aria-hidden="true" style={{ display: "contents" }}>
-            {item}
-          </div>
+          <div key={`clone-${i}`} aria-hidden="true" style={{ display: "contents" }}>{item}</div>
         ))}
       </div>
     </div>
@@ -183,408 +174,248 @@ function Index() {
   const [faq, setFaq] = useState<number | null>(0);
 
   return (
-    <div className="ps-page">
-      <header className="ps-header">
-        <a href="#inicio" aria-label="Início">
-          <Logo small />
+    <div className="ns-page">
+      <header className="ns-header">
+        <a href="#inicio" aria-label="Nildes Souza Estética">
+          <Brand compact />
         </a>
         <nav>
-          {navLinks.map(([label, href]) => (
-            <a key={label} href={href}>
-              {label}
-            </a>
-          ))}
+          {navLinks.map(([label, href]) => <a key={label} href={href}>{label}</a>)}
         </nav>
-        <a className="header-wa" href={wa} target="_blank" rel="noreferrer">
-          <span className="header-wa-icon">
-            <Phone size={16} />
-          </span>
-          <span>
-            Agende pelo WhatsApp
-            <br />
-            <b>(75) 9701-8423</b>
-          </span>
-        </a>
-        <button className="menu-btn" onClick={() => setMenu(!menu)} aria-label="Abrir menu">
+        <Button href="#agendamento">Agendar horário</Button>
+        <button className="ns-menu-btn" onClick={() => setMenu(!menu)} aria-label={menu ? "Fechar menu" : "Abrir menu"}>
           {menu ? <X /> : <Menu />}
         </button>
       </header>
 
       {menu && (
-        <div className="mobile-menu">
+        <div className="ns-mobile-menu">
           {navLinks.map(([label, href]) => (
-            <a key={label} href={href} onClick={() => setMenu(false)}>
-              {label}
-            </a>
+            <a key={label} href={href} onClick={() => setMenu(false)}>{label}</a>
           ))}
-          <Button />
+          <Button href="#agendamento">Agendar meu horário</Button>
         </div>
       )}
 
       <main>
-        <section id="inicio" className="ps-hero">
-          <div className="hero-bg" aria-hidden="true">
-            <img src={heroImg} alt="" />
-          </div>
-          <div className="hero-copy">
-            <span className="mini-label">Clínica Médica Pró-Saúde · Macururé - BA</span>
-            <h1>
-              Um lugar para <em>cuidar de você</em> e de quem você ama.
-            </h1>
-            <p>
-              Consultas, exames e coleta laboratorial em um só lugar, com profissionais especializados e
-              atendimento humanizado para toda a família.
-            </p>
-            <div className="hero-actions">
-              <Button />
-              <Button light href="#especialidades">
-                Ver especialidades
-              </Button>
+        <section id="inicio" className="ns-hero">
+          <div className="hero-decoration hero-decoration-one" />
+          <div className="hero-decoration hero-decoration-two" />
+          <div className="ns-container hero-grid">
+            <div className="hero-copy">
+              <span className="ns-eyebrow"><Sparkles size={14} /> Nildes Souza Estética</span>
+              <h1>Realce sua beleza.<br /><em>Cuide de você.</em></h1>
+              <p>Um espaço para transformar o autocuidado em uma experiência de beleza, leveza e bem-estar.</p>
+              <div className="hero-actions">
+                <Button href="#agendamento">Agendar meu horário</Button>
+                <Button href="#procedimentos" light>Conhecer procedimentos</Button>
+              </div>
+              <div className="hero-trust">
+                <span><Check size={15} /> Atendimento personalizado</span>
+                <span><Check size={15} /> Ambiente acolhedor</span>
+                <span><Check size={15} /> Momento de autocuidado</span>
+              </div>
             </div>
-            <div className="hero-trust">
-              <span>
-                <CheckCircle2 /> Atendimento humanizado
-              </span>
-              <span>
-                <CheckCircle2 /> Adultos e crianças
-              </span>
-              <span>
-                <CheckCircle2 /> Consultas e exames
-              </span>
+            <div className="hero-visual">
+              <div className="hero-photo-main">
+                <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=90" alt="Cuidado facial em clínica de estética" />
+              </div>
+              <div className="hero-photo-small">
+                <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=700&q=88" alt="Momento de relaxamento" />
+              </div>
+              <div className="hero-note"><Heart size={17} fill="currentColor" /><span>Seu momento<br /><b>começa aqui</b></span></div>
             </div>
           </div>
         </section>
 
-        <section id="especialidades" className="ps-section">
-          <SectionTitle
-            eyebrow="Nossas especialidades"
-            title="Especialidades para cuidar de você"
-            sub="Uma equipe preparada para acompanhar diferentes necessidades, com atenção, precisão e acolhimento."
-          />
-          <Marquee label="Especialidades" duration={30}>
-            {specialties.map(([Icon, name, text, img], i) => (
-              <article className="specialty-card" key={name}>
-                <div className="specialty-visual">
-                  <img src={img} alt={`Atendimento de ${name}`} loading="lazy" width={800} height={600} />
-                  <span className="card-number">0{i + 1}</span>
-                  <div className="card-icon">
-                    <Icon />
+        <section className="ns-intro-strip">
+          <div className="ns-container intro-inner">
+            <span>BELEZA</span><i /> <span>CUIDADO</span><i /> <span>BEM-ESTAR</span><i /> <span>AUTOESTIMA</span>
+          </div>
+        </section>
+
+        <section id="sobre" className="ns-section ns-about">
+          <div className="ns-container about-grid">
+            <div className="about-visual">
+              <div className="about-image-main">
+                <img src="https://images.unsplash.com/photo-1552693673-1bf958298935?auto=format&fit=crop&w=1100&q=90" alt="Ambiente de estética e autocuidado" loading="lazy" />
+              </div>
+              <div className="about-badge"><span>NS</span><small>Estética</small></div>
+              <div className="about-flower">✦</div>
+            </div>
+            <div className="about-copy">
+              <span className="ns-eyebrow"><Sparkles size={14} /> Um espaço para você</span>
+              <h2>Cuidar de você é a nossa <em>essência.</em></h2>
+              <p>Na Nildes Souza Estética, cada atendimento é um convite para desacelerar e reservar um tempo para si. Unimos cuidado, beleza e bem-estar em uma experiência acolhedora e personalizada.</p>
+              <p>Do primeiro contato ao final do atendimento, queremos que você se sinta confortável, valorizada e especial.</p>
+              <div className="about-points">
+                <div><span><Heart /></span><b>Cuidado com carinho</b><small>Um atendimento próximo e acolhedor.</small></div>
+                <div><span><Sparkles /></span><b>Beleza em cada detalhe</b><small>Procedimentos pensados para você.</small></div>
+              </div>
+              <Button href="#agendamento">Quero viver essa experiência</Button>
+            </div>
+          </div>
+        </section>
+
+        <section id="procedimentos" className="ns-section ns-procedures">
+          <div className="ns-container">
+            <SectionTitle eyebrow="Nossos cuidados" title="Tudo o que você precisa para realçar sua beleza" sub="Escolha seu momento de cuidado e encontre o procedimento que combina com você." />
+            <Marquee label="Procedimentos estéticos" duration={36}>
+              {procedures.map((item, i) => (
+                <article className="procedure-card" key={item.name}>
+                  <div className="procedure-image">
+                    <img src={item.image} alt={item.name} loading="lazy" />
+                    <span>0{i + 1}</span>
+                    <button className="procedure-heart" aria-label={`Agendar ${item.name}`} onClick={() => document.getElementById("agendamento")?.scrollIntoView({ behavior: "smooth" })}><Heart size={18} /></button>
                   </div>
-                </div>
-                <div className="specialty-body">
-                  <h3>{name}</h3>
-                  <p>{text}</p>
-                </div>
-              </article>
-            ))}
-          </Marquee>
-          <div className="section-cta">
-            <Button>Agendar minha consulta</Button>
-          </div>
-        </section>
-
-        <section id="exames" className="ps-exams">
-          <div className="exam-head">
-            <div>
-              <span className="section-eyebrow">
-                <ClipboardList size={13} /> Exames e serviços
-              </span>
-              <h2>Precisão para cuidar melhor da sua saúde.</h2>
-              <p>Exames selecionados para facilitar sua rotina e apoiar um diagnóstico mais completo.</p>
-            </div>
-            <Button light>Falar com a equipe</Button>
-          </div>
-          <Marquee label="Exames e serviços" duration={27}>
-            {exams.map(([Icon, name, text, img]) => (
-              <article className="exam-card" key={name}>
-                <div className="exam-visual">
-                  <img src={img} alt={name} loading="lazy" width={800} height={600} />
-                </div>
-                <div className="exam-card-body">
-                  <div className="exam-icon-badge">
-                    <Icon />
+                  <div className="procedure-body">
+                    <span className="procedure-eyebrow">{item.eyebrow}</span>
+                    <h3>{item.name}</h3>
+                    <p>{item.text}</p>
+                    <a href="#agendamento">Agendar <ArrowRight size={15} /></a>
                   </div>
-                  <span>EXAME</span>
-                  <h3>{name}</h3>
-                  <p>{text}</p>
-                </div>
-              </article>
-            ))}
-          </Marquee>
-          <div className="lab-banner">
-            <div className="lab-badge">
-              <Microscope />
-            </div>
-            <div>
-              <b>COLETA LABORATORIAL</b>
-              <span>Praticidade, segurança e acolhimento em cada etapa.</span>
-            </div>
-          </div>
-          <div className="section-cta">
-            <Button>Agendar meu exame</Button>
+                </article>
+              ))}
+            </Marquee>
+            <div className="carousel-hint"><span /> Arraste ou passe o mouse para explorar <span /></div>
           </div>
         </section>
 
-        <section id="atendimento-infantil" className="ps-three">
-          <article className="child-card">
-            <img src={childImg} alt="Pediatra atendendo crianças" loading="lazy" width={1000} height={1200} />
-            <div className="child-content">
-              <span className="mini-label light-label">Atendimento infantil</span>
-              <h2>Cuidado especial para os pequenos.</h2>
-              <p>Um ambiente acolhedor para que crianças e famílias se sintam seguras em cada atendimento.</p>
-              <Button>Saiba mais</Button>
+        <section id="experiencia" className="ns-experience">
+          <div className="ns-container experience-grid">
+            <div className="experience-copy">
+              <span className="ns-eyebrow light"><Sparkles size={14} /> Sua experiência</span>
+              <h2>Mais do que um procedimento.<br /><em>Um momento para você.</em></h2>
+              <p>Porque autocuidado não precisa ser corrido. Aqui, cada detalhe foi pensado para que você possa respirar, relaxar e sair se sentindo ainda melhor.</p>
+              <div className="experience-list">
+                <div><span>01</span><p><b>Atendimento personalizado</b><small>Olhar atento às suas necessidades e ao que faz sentido para você.</small></p></div>
+                <div><span>02</span><p><b>Ambiente acolhedor</b><small>Um espaço agradável para transformar seu atendimento em uma pausa especial.</small></p></div>
+                <div><span>03</span><p><b>Cuidado do início ao fim</b><small>Uma experiência pensada nos pequenos detalhes.</small></p></div>
+              </div>
+              <Button href="#agendamento" light>Reservar meu momento</Button>
             </div>
-          </article>
+            <div className="experience-visual">
+              <div className="experience-photo large"><img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1000&q=90" alt="Mulher em momento de autocuidado" loading="lazy" /></div>
+              <div className="experience-photo small"><img src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b0?auto=format&fit=crop&w=700&q=88" alt="Cuidado de pele" loading="lazy" /></div>
+              <div className="experience-stamp"><Star size={15} fill="currentColor" /><span>Seu cuidado<br /><b>merece atenção</b></span></div>
+            </div>
+          </div>
+        </section>
 
-          <article className="why-card">
-            <span className="section-eyebrow">
-              <Heart size={13} /> Por que a Pró-Saúde?
-            </span>
-            <h2>Cuidado que começa no atendimento.</h2>
-            <p className="why-lead">
-              Da recepção ao acompanhamento, cada detalhe foi pensado para tornar sua experiência mais tranquila.
-            </p>
-            <div className="why-list">
-              {[
-                "Atendimento humanizado",
-                "Diversas especialidades",
-                "Adultos e crianças",
-                "Coleta laboratorial",
-                "Ambiente organizado",
-                "Fácil agendamento",
-                "Resultados confiáveis",
-                "Localização acessível",
-              ].map((x) => (
-                <p key={x}>
-                  <CheckCircle2 />
-                  {x}
-                </p>
+        <section className="ns-benefits ns-section">
+          <div className="ns-container">
+            <SectionTitle eyebrow="Por que escolher a Nildes" title="Um cuidado pensado nos detalhes" sub="Tudo para você se sentir bem, acolhida e confiante em cada visita." />
+            <div className="benefit-grid">
+              <article><span><Heart /></span><h3>Atendimento acolhedor</h3><p>Um olhar cuidadoso para tornar cada visita mais leve e especial.</p></article>
+              <article><span><Sparkles /></span><h3>Experiência personalizada</h3><p>Procedimentos e cuidados escolhidos para valorizar o que você busca.</p></article>
+              <article><span><Check /></span><h3>Profissionalismo</h3><p>Organização, atenção e cuidado em todos os detalhes do atendimento.</p></article>
+              <article><span><Star /></span><h3>Momento de autocuidado</h3><p>Uma pausa na rotina para cuidar da beleza e do bem-estar.</p></article>
+            </div>
+          </div>
+        </section>
+
+        <section className="ns-quote">
+          <div className="ns-container quote-inner">
+            <span className="quote-mark">“</span>
+            <h2>Presenteie-se com saúde,<br /><em>relaxamento e autoestima.</em></h2>
+            <p>Seu tempo também importa.</p>
+            <div className="quote-line" />
+          </div>
+        </section>
+
+        <section className="ns-reviews ns-section">
+          <div className="ns-container">
+            <SectionTitle eyebrow="Experiências" title="Quem vive, sente a diferença" sub="Algumas palavras de quem já reservou um momento para si." />
+            <Marquee label="Depoimentos" duration={31}>
+              {reviews.map(([name, text]) => (
+                <article className="review-card" key={name}>
+                  <div className="review-stars">★★★★★</div>
+                  <p>“{text}”</p>
+                  <div className="review-person"><span>{name.charAt(0)}</span><b>{name}</b><small>Cliente</small></div>
+                </article>
+              ))}
+            </Marquee>
+          </div>
+        </section>
+
+        <section id="agendamento" className="ns-booking">
+          <div className="ns-container booking-card">
+            <div className="booking-copy">
+              <span className="ns-eyebrow"><CalendarDays size={14} /> Agendamento</span>
+              <h2>Seu momento começa com um <em>horário reservado.</em></h2>
+              <p>Escolha seu procedimento e reserve seu atendimento de forma simples. Esta área está preparada para receber a integração com o Google Agenda.</p>
+              <div className="booking-info"><span><Clock3 size={17} /> Agendamento online</span><span><Check size={17} /> Atendimento personalizado</span></div>
+            </div>
+            <div className="booking-action">
+              <div className="calendar-icon"><CalendarDays /></div>
+              <h3>Agende seu horário</h3>
+              <p>Em breve, você poderá escolher a data e o horário diretamente por aqui.</p>
+              <Button href={wa} whatsapp>Agendar pelo WhatsApp</Button>
+              <small>Enquanto a agenda online é configurada, fale conosco pelo WhatsApp.</small>
+            </div>
+          </div>
+        </section>
+
+        <section id="duvidas" className="ns-faq ns-section">
+          <div className="ns-container faq-grid">
+            <div className="faq-intro">
+              <span className="ns-eyebrow"><Sparkles size={14} /> Dúvidas frequentes</span>
+              <h2>Tudo mais simples para você.</h2>
+              <p>Confira algumas respostas rápidas. Se ainda tiver alguma dúvida, nossa equipe está à disposição.</p>
+              <Button href={wa} whatsapp>Falar no WhatsApp</Button>
+            </div>
+            <div className="faq-list">
+              {faqs.map((q, i) => (
+                <div className={`faq-item ${faq === i ? "open" : ""}`} key={q}>
+                  <button onClick={() => setFaq(faq === i ? null : i)} aria-expanded={faq === i}>
+                    <span>0{i + 1}</span><b>{q}</b><ChevronDown />
+                  </button>
+                  {faq === i && <p>Fale com nossa equipe pelo WhatsApp para receber as orientações e informações sobre seu atendimento.</p>}
+                </div>
               ))}
             </div>
-          </article>
-        </section>
-
-        <section className="ps-strip">
-          <div>
-            <span>Precisa de atendimento?</span>
-            <h2>Sua saúde não pode esperar.</h2>
-          </div>
-          <a className="strip-wa" href={wa} target="_blank" rel="noreferrer">
-            <Phone />
-            <span>
-              Falar pelo WhatsApp
-              <br />
-              <b>(75) 9701-8423</b>
-            </span>
-          </a>
-          <div className="strip-feature">
-            <CalendarDays />
-            <span>
-              Agendamento
-              <br />
-              <b>rápido</b>
-            </span>
-          </div>
-          <div className="strip-feature">
-            <ShieldCheck />
-            <span>
-              Atendimento
-              <br />
-              <b>seguro</b>
-            </span>
-          </div>
-          <div className="strip-feature">
-            <Heart />
-            <span>
-              Cuidado de
-              <br />
-              <b>verdade</b>
-            </span>
           </div>
         </section>
 
-        <section id="a-clinica" className="ps-about">
-          <div className="about-photo">
-            <img src={clinicImg} alt="Recepção da Clínica Médica Pró-Saúde" loading="lazy" width={1200} height={1000} />
-          </div>
-          <div className="about-copy">
-            <span className="section-eyebrow">A Clínica Médica Pró-Saúde</span>
-            <h2>Saúde com proximidade, confiança e cuidado.</h2>
-            <p>
-              A Clínica Médica Pró-Saúde está em Macururé - BA para oferecer atendimento de qualidade, com
-              profissionais especializados, exames modernos e um cuidado humanizado para toda a família.
-            </p>
-            <div className="values">
-              <div>
-                <Heart />
-                <b>Nossa missão</b>
-                <small>Cuidar de você e da sua família com respeito, ética e acolhimento.</small>
+        <section id="contato" className="ns-contact">
+          <div className="ns-container contact-grid">
+            <div className="contact-copy">
+              <span className="ns-eyebrow"><MapPin size={14} /> Visite a Nildes Souza Estética</span>
+              <Brand />
+              <h2>Seu próximo momento de cuidado está aqui.</h2>
+              <p>Tudo o que você precisa para realçar sua beleza, em um espaço acolhedor no Imbuí.</p>
+              <div className="contact-details">
+                <a href={mapUrl} target="_blank" rel="noreferrer"><MapPin /> <span><b>Rua das Gaivotas, 196</b><small>Imbuí Center, Sala 101 · Ao lado da Subway</small></span></a>
+                <a href={wa} target="_blank" rel="noreferrer"><MessageCircle /> <span><b>(71) 98129-4334</b><small>Fale conosco pelo WhatsApp</small></span></a>
+                <a href={instagramUrl} target="_blank" rel="noreferrer"><Instagram /> <span><b>@nildes.estetica</b><small>Acompanhe no Instagram</small></span></a>
               </div>
-              <div>
-                <ShieldCheck />
-                <b>Nossa visão</b>
-                <small>Ser referência em saúde na nossa região.</small>
-              </div>
-              <div>
-                <Users />
-                <b>Nossos valores</b>
-                <small>Humanização, qualidade, segurança e confiança.</small>
+              <Button href={mapUrl}>Como chegar</Button>
+            </div>
+            <div className="contact-map">
+              <div className="map-card">
+                <div className="map-pattern" />
+                <div className="map-pin"><MapPin size={26} /></div>
+                <div className="map-label"><b>Imbuí Center</b><span>Rua das Gaivotas, 196 · Sala 101</span></div>
+                <a href={mapUrl} target="_blank" rel="noreferrer">Abrir no Google Maps <ArrowUpRight size={15} /></a>
               </div>
             </div>
-            <Button>Conheça a clínica</Button>
-          </div>
-        </section>
-
-        <section className="ps-reviews">
-          <SectionTitle
-            eyebrow="O que nossos pacientes dizem"
-            title="Confiança de quem já escolheu a Pró-Saúde"
-            sub="Experiências reais de pacientes que encontraram acolhimento, organização e cuidado."
-          />
-          <Marquee label="Avaliações de pacientes" duration={32}>
-            {reviews.map(([name, text]) => (
-              <article className="review-card" key={name}>
-                <div className="review-top">
-                  <div className="avatar">
-                    {name
-                      .split(" ")
-                      .map((x) => x[0])
-                      .slice(0, 2)
-                      .join("")}
-                  </div>
-                  <div>
-                    <b>{name}</b>
-                    <div className="stars">★★★★★</div>
-                  </div>
-                  <span className="quote-mark">“</span>
-                </div>
-                <p>“{text}”</p>
-                <div className="review-foot">
-                  <CheckCircle2 size={14} /> Paciente da Pró-Saúde
-                </div>
-              </article>
-            ))}
-          </Marquee>
-          <div className="section-cta">
-            <Button>Agendar pelo WhatsApp</Button>
-          </div>
-          <div className="review-note">
-            <CheckCircle2 size={15} /> Atendimento que deixa uma boa impressão do começo ao fim.
-          </div>
-        </section>
-
-        <section id="contato" className="ps-contact">
-          <div className="contact-copy">
-            <span className="section-eyebrow">Onde estamos · Fale com a Pró-Saúde</span>
-            <Logo />
-            <h2>Estamos prontos para acolher você e sua família.</h2>
-            <p>Agende sua consulta, tire suas dúvidas ou venha nos visitar em Macururé - BA.</p>
-            <Button>Agendar atendimento</Button>
-            <div className="contact-details">
-              <span>
-                <Phone /> (75) 9701-8423
-              </span>
-              <span>
-                <MapPin /> Macururé - BA
-              </span>
-            </div>
-            <div className="contact-place">
-              <b>Nosso endereço</b>
-              <p>
-                <MapPin /> Macururé - BA — Em frente ao Hospital Municipal
-              </p>
-              <p>
-                <Clock3 /> Atendimento de segunda a sexta, com agendamento pelo WhatsApp
-              </p>
-              <a href={mapUrl} target="_blank" rel="noreferrer">
-                Como chegar <Navigation size={14} />
-              </a>
-            </div>
-          </div>
-          <div className="contact-map">
-            <iframe
-              title="Mapa da Clínica Médica Pró-Saúde em Macururé - BA"
-              src="https://www.google.com/maps?q=Clinica%20Medica%20Pro-Saude%20Macurure%20BA&output=embed"
-              loading="lazy"
-            />
-          </div>
-        </section>
-
-        <section id="duvidas" className="ps-faq">
-          <div className="faq-intro">
-            <span className="section-eyebrow">Dúvidas frequentes</span>
-            <h2>Tem alguma dúvida?</h2>
-            <p>
-              Reunimos respostas rápidas para facilitar seu atendimento. Se precisar, fale diretamente com nossa
-              equipe.
-            </p>
-            <Button>Tirar minha dúvida</Button>
-          </div>
-          <div className="faq-list">
-            {faqs.map((q, i) => (
-              <div className={`faq-item ${faq === i ? "open" : ""}`} key={q}>
-                <button onClick={() => setFaq(faq === i ? null : i)} aria-expanded={faq === i}>
-                  <span>0{i + 1}</span>
-                  <b>{q}</b>
-                  <ChevronDown />
-                </button>
-                {faq === i && (
-                  <p>
-                    Fale com nossa equipe pelo WhatsApp para receber todas as orientações de acordo com o seu
-                    atendimento.
-                  </p>
-                )}
-              </div>
-            ))}
           </div>
         </section>
       </main>
 
-      <footer>
-        <div className="footer-top">
-          <div>
-            <Logo />
-            <p>Saúde, confiança e acolhimento para Macururé e toda a família.</p>
-          </div>
-          <div>
-            <h3>Links rápidos</h3>
-            {navLinks.slice(0, 5).map(([label, href]) => (
-              <a key={label} href={href}>
-                {label}
-              </a>
-            ))}
-          </div>
-          <div>
-            <h3>Contato</h3>
-            <a href={wa} target="_blank" rel="noreferrer">
-              <Phone /> (75) 9701-8423
-            </a>
-            <span>
-              <MapPin /> Macururé - BA — Em frente ao Hospital Municipal
-            </span>
-            <a href="https://instagram.com/prosaude.macurure" target="_blank" rel="noreferrer">
-              <Instagram /> @prosaude.macurure
-            </a>
-          </div>
-          <div>
-            <h3>Nossa missão</h3>
-            <p>“Cuidar de você e da sua família com respeito, ética e acolhimento, em todas as fases da vida.”</p>
-          </div>
+      <footer className="ns-footer">
+        <div className="ns-container footer-top">
+          <div className="footer-brand"><Brand /><p>Tudo o que você precisa para realçar sua beleza.</p></div>
+          <div><h3>Navegação</h3>{navLinks.slice(0, 5).map(([label, href]) => <a key={label} href={href}>{label}</a>)}</div>
+          <div><h3>Procedimentos</h3>{procedures.slice(0, 5).map((p) => <a key={p.name} href="#procedimentos">{p.name}</a>)}</div>
+          <div><h3>Contato</h3><a href={wa} target="_blank" rel="noreferrer"><MessageCircle /> (71) 98129-4334</a><a href={instagramUrl} target="_blank" rel="noreferrer"><Instagram /> @nildes.estetica</a><span><MapPin /> Imbuí Center · Sala 101</span></div>
         </div>
-        <div className="footer-bottom">
-          <span>© 2026 Clínica Médica Pró-Saúde. Todos os direitos reservados.</span>
-          <span>Política de Privacidade | Termos de Uso</span>
-        </div>
+        <div className="ns-container footer-bottom"><span>© 2026 Nildes Souza Estética. Todos os direitos reservados.</span><span>Beleza · Cuidado · Bem-estar</span></div>
       </footer>
 
-      <a
-        className="floating-wa"
-        href={wa}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Falar com a Pró-Saúde pelo WhatsApp"
-      >
-        <img src={waIcon.url} alt="WhatsApp" />
+      <a className="floating-wa" href={wa} target="_blank" rel="noreferrer" aria-label="Falar com a Nildes Souza Estética pelo WhatsApp">
+        <MessageCircle size={29} />
+        <span>Fale conosco</span>
       </a>
     </div>
   );
