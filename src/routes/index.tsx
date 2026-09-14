@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Children, useState, type ReactNode } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -10,11 +10,9 @@ import {
   Heart,
   Instagram,
   MapPin,
-  Menu,
   MessageCircle,
   Sparkles,
   Star,
-  X,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -25,15 +23,14 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Nildes Souza Estética: auriculoterapia, design de sobrancelhas, limpeza de pele, peeling, ventosaterapia e massagem relaxante no Imbuí, Salvador - BA.",
+          "Nildes Souza Estética no Imbuí, Salvador: auriculoterapia, design de sobrancelhas, limpeza de pele, peeling, ventosaterapia e massagem relaxante.",
       },
-      { property: "og:title", content: "Nildes Souza Estética | Beleza, Cuidado e Bem-Estar" },
+      { property: "og:title", content: "Nildes Souza Estética" },
       {
         property: "og:description",
-        content: "Tudo o que você precisa para realçar sua beleza, cuidar de você e viver momentos de bem-estar.",
+        content: "Tudo o que você precisa para realçar sua beleza.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
@@ -41,54 +38,51 @@ export const Route = createFileRoute("/")({
 const wa =
   "https://wa.me/5571981294334?text=Ol%C3%A1!%20Quero%20agendar%20um%20hor%C3%A1rio%20na%20Nildes%20Souza%20Est%C3%A9tica.";
 const mapUrl =
-  "https://www.google.com/maps/search/?api=1&query=Rua+das+Gaivotas+196+Imbui+Center+Sala+101+Salvador+BA";
+  "https://www.google.com/maps/search/?api=1&query=Rua+das+Gaivotas%2C+196%2C+Imbui+Center%2C+Sala+101%2C+Salvador%2C+BA";
 const instagramUrl = "https://instagram.com/nildes.estetica";
-
-const navLinks: [string, string][] = [
-  ["Início", "#inicio"],
-  ["Sobre", "#sobre"],
-  ["Procedimentos", "#procedimentos"],
-  ["Experiência", "#experiencia"],
-  ["Dúvidas", "#duvidas"],
-  ["Agendamento", "#agendamento"],
-];
 
 const procedures = [
   {
     name: "Limpeza de Pele",
-    eyebrow: "Pele renovada",
-    text: "Um cuidado completo para deixar a pele mais limpa, leve e com aparência saudável.",
-    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1000&q=88",
+    tag: "Pele renovada",
+    text: "Um cuidado delicado para deixar a pele mais limpa, leve e com aparência saudável.",
+    image:
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1000&q=90",
   },
   {
     name: "Design de Sobrancelhas",
-    eyebrow: "Olhar em destaque",
+    tag: "Olhar em destaque",
     text: "Valorize seus traços com um design pensado para harmonizar o seu olhar.",
-    image: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=1000&q=88",
+    image:
+      "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1000&q=90",
   },
   {
     name: "Massagem Relaxante",
-    eyebrow: "Pausa para você",
-    text: "Um momento de relaxamento para desacelerar, aliviar tensões e cuidar do bem-estar.",
-    image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1000&q=88",
+    tag: "Pausa para você",
+    text: "Um momento de relaxamento para desacelerar e cuidar do seu bem-estar.",
+    image:
+      "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1000&q=90",
   },
   {
     name: "Ventosaterapia",
-    eyebrow: "Cuidado corporal",
-    text: "Uma experiência de cuidado que complementa sua rotina de bem-estar e relaxamento.",
-    image: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=1000&q=88",
+    tag: "Cuidado corporal",
+    text: "Uma experiência de cuidado corporal para complementar sua rotina de bem-estar.",
+    image:
+      "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=1000&q=90",
   },
   {
     name: "Peeling",
-    eyebrow: "Renovação da pele",
-    text: "Cuidado estético para promover renovação e deixar a pele com aspecto mais uniforme.",
-    image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b0?auto=format&fit=crop&w=1000&q=88",
+    tag: "Renovação da pele",
+    text: "Cuidado estético que favorece a renovação e uma aparência mais uniforme da pele.",
+    image:
+      "https://images.unsplash.com/photo-1616394584738-fc6e612e71b0?auto=format&fit=crop&w=1000&q=90",
   },
   {
     name: "Auriculoterapia",
-    eyebrow: "Equilíbrio e cuidado",
-    text: "Uma prática de cuidado complementar para quem busca uma pausa de atenção ao corpo e à mente.",
-    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1000&q=88",
+    tag: "Equilíbrio e cuidado",
+    text: "Uma prática complementar para quem busca uma pausa de atenção ao corpo e à mente.",
+    image:
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1000&q=90",
   },
 ] as const;
 
@@ -100,24 +94,22 @@ const reviews = [
 ] as const;
 
 const faqs = [
-  "Preciso agendar antes de ir?",
-  "Onde fica a Nildes Souza Estética?",
-  "Quais procedimentos estão disponíveis?",
-  "Como funciona o agendamento online?",
-  "Posso agendar mais de um procedimento?",
-  "Como entro em contato pelo WhatsApp?",
-];
+  ["Preciso agendar antes de ir?", "Sim. Recomendamos o agendamento para reservar seu horário e oferecer um atendimento tranquilo e personalizado."],
+  ["Onde fica a Nildes Souza Estética?", "Estamos na Rua das Gaivotas, 196, Imbuí Center, Sala 101, ao lado da Subway, em Salvador - BA."],
+  ["Quais procedimentos estão disponíveis?", "Auriculoterapia, design de sobrancelhas, limpeza de pele, peeling, ventosaterapia e massagem relaxante."],
+  ["Como funciona o agendamento online?", "Você preenche seus dados, escolhe o tratamento, a data e um dos horários disponíveis. A integração com a agenda online pode ser conectada posteriormente."],
+  ["Posso agendar mais de um procedimento?", "Sim. Informe os procedimentos desejados nas observações para verificarmos a melhor organização do seu atendimento."],
+  ["Como posso entrar em contato?", "Você pode falar conosco pelo WhatsApp ou acompanhar a Nildes Souza Estética no Instagram @nildes.estetica."],
+] as const;
 
 function Button({
-  children = "Agendar meu horário",
+  children,
   href = "#agendamento",
   light = false,
-  whatsapp = false,
 }: {
-  children?: ReactNode;
+  children: ReactNode;
   href?: string;
   light?: boolean;
-  whatsapp?: boolean;
 }) {
   const external = href.startsWith("http");
   return (
@@ -126,28 +118,39 @@ function Button({
       href={href}
       {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
     >
-      {whatsapp && <MessageCircle size={17} />}
       {children}
-      {!whatsapp && <ArrowUpRight size={16} />}
+      <ArrowUpRight size={16} />
     </a>
   );
 }
 
-function SectionTitle({ eyebrow, title, sub }: { eyebrow: string; title: string; sub: string }) {
+function SectionTitle({
+  eyebrow,
+  title,
+  sub,
+  light = false,
+}: {
+  eyebrow: string;
+  title: string;
+  sub: string;
+  light?: boolean;
+}) {
   return (
-    <div className="ns-section-title">
-      <span className="ns-eyebrow"><Sparkles size={14} /> {eyebrow}</span>
+    <div className={`ns-section-title ${light ? "light" : ""}`}>
+      <span className="ns-eyebrow">
+        <Sparkles size={14} /> {eyebrow}
+      </span>
       <h2>{title}</h2>
       <p>{sub}</p>
     </div>
   );
 }
 
-function Brand({ compact = false }: { compact?: boolean }) {
+function Brand() {
   return (
-    <div className={`ns-brand ${compact ? "compact" : ""}`} aria-label="Nildes Souza Estética">
+    <div className="ns-brand" aria-label="Nildes Souza Estética">
       <div className="brand-symbol">NS</div>
-      <div className="brand-name">
+      <div>
         <strong>NILDES SOUZA</strong>
         <span>ESTÉTICA</span>
       </div>
@@ -155,266 +158,240 @@ function Brand({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function Marquee({ children, label, duration = 34 }: { children: ReactNode; label: string; duration?: number }) {
-  const items = Children.toArray(children);
+function LoopCarousel({ children, duration = 34 }: { children: ReactNode; duration?: number }) {
   return (
-    <div className="ns-marquee" role="group" aria-label={label}>
-      <div className="ns-marquee-track" style={{ ["--marquee-duration" as string]: `${duration}s` }}>
-        {items}
-        {items.map((item, i) => (
-          <div key={`clone-${i}`} aria-hidden="true" style={{ display: "contents" }}>{item}</div>
-        ))}
+    <div className="ns-loop-wrap">
+      <div className="loop-fade loop-fade-left" />
+      <div className="loop-fade loop-fade-right" />
+      <div className="ns-loop" style={{ "--loop-duration": `${duration}s` } as React.CSSProperties}>
+        <div className="ns-loop-track">
+          <div className="ns-loop-set">{children}</div>
+          <div className="ns-loop-set" aria-hidden="true">{children}</div>
+        </div>
       </div>
     </div>
   );
 }
 
 function Index() {
-  const [menu, setMenu] = useState(false);
-  const [faq, setFaq] = useState<number | null>(0);
+  const [openFaq, setOpenFaq] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const name = String(form.get("name") || "");
+    const phone = String(form.get("phone") || "");
+    const treatment = String(form.get("treatment") || "");
+    const date = String(form.get("date") || "");
+    const time = String(form.get("time") || "");
+    const notes = String(form.get("notes") || "");
+    const message = `Olá! Quero solicitar um agendamento na Nildes Souza Estética.%0A%0ANome: ${encodeURIComponent(name)}%0ATelefone: ${encodeURIComponent(phone)}%0ATratamento: ${encodeURIComponent(treatment)}%0AData: ${encodeURIComponent(date)}%0AHorário: ${encodeURIComponent(time)}%0AObservações: ${encodeURIComponent(notes || "Nenhuma")}`;
+    setSubmitted(true);
+    window.open(`https://wa.me/5571981294334?text=${message}`, "_blank", "noopener,noreferrer");
+  }
 
   return (
     <div className="ns-page">
-      <header className="ns-header">
-        <a href="#inicio" aria-label="Nildes Souza Estética">
-          <Brand compact />
-        </a>
-        <nav>
-          {navLinks.map(([label, href]) => <a key={label} href={href}>{label}</a>)}
-        </nav>
-        <Button href="#agendamento">Agendar horário</Button>
-        <button className="ns-menu-btn" onClick={() => setMenu(!menu)} aria-label={menu ? "Fechar menu" : "Abrir menu"}>
-          {menu ? <X /> : <Menu />}
-        </button>
-      </header>
-
-      {menu && (
-        <div className="ns-mobile-menu">
-          {navLinks.map(([label, href]) => (
-            <a key={label} href={href} onClick={() => setMenu(false)}>{label}</a>
-          ))}
-          <Button href="#agendamento">Agendar meu horário</Button>
-        </div>
-      )}
-
       <main>
         <section id="inicio" className="ns-hero">
-          <div className="hero-decoration hero-decoration-one" />
-          <div className="hero-decoration hero-decoration-two" />
-          <div className="ns-container hero-grid">
-            <div className="hero-copy">
-              <span className="ns-eyebrow"><Sparkles size={14} /> Nildes Souza Estética</span>
-              <h1>Realce sua beleza.<br /><em>Cuide de você.</em></h1>
-              <p>Um espaço para transformar o autocuidado em uma experiência de beleza, leveza e bem-estar.</p>
-              <div className="hero-actions">
-                <Button href="#agendamento">Agendar meu horário</Button>
-                <Button href="#procedimentos" light>Conhecer procedimentos</Button>
-              </div>
-              <div className="hero-trust">
-                <span><Check size={15} /> Atendimento personalizado</span>
-                <span><Check size={15} /> Ambiente acolhedor</span>
-                <span><Check size={15} /> Momento de autocuidado</span>
-              </div>
+          <div className="hero-orb hero-orb-one" />
+          <div className="hero-orb hero-orb-two" />
+          <div className="ns-container hero-inner">
+            <Brand />
+            <span className="ns-eyebrow hero-eyebrow"><Sparkles size={14} /> Beleza • Cuidado • Bem-estar</span>
+            <h1>Realce sua beleza.<br /><em>Cuide de você.</em></h1>
+            <p>Um espaço pensado para transformar o autocuidado em uma experiência leve, acolhedora e especial.</p>
+            <div className="hero-actions">
+              <Button href="#agendamento">Agendar meu horário</Button>
+              <Button href="#procedimentos" light>Conhecer procedimentos</Button>
             </div>
-            <div className="hero-visual">
-              <div className="hero-photo-main">
-                <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=90" alt="Cuidado facial em clínica de estética" />
-              </div>
-              <div className="hero-photo-small">
-                <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=700&q=88" alt="Momento de relaxamento" />
-              </div>
-              <div className="hero-note"><Heart size={17} fill="currentColor" /><span>Seu momento<br /><b>começa aqui</b></span></div>
+            <div className="hero-mini-points">
+              <span><Check size={15} /> Atendimento personalizado</span>
+              <span><Check size={15} /> Ambiente acolhedor</span>
+              <span><Check size={15} /> Cuidado em cada detalhe</span>
             </div>
           </div>
         </section>
 
-        <section className="ns-intro-strip">
-          <div className="ns-container intro-inner">
-            <span>BELEZA</span><i /> <span>CUIDADO</span><i /> <span>BEM-ESTAR</span><i /> <span>AUTOESTIMA</span>
-          </div>
+        <section className="ns-value-strip" aria-label="Especialidades da Nildes Souza Estética">
+          <LoopCarousel duration={24}>
+            {[
+              "BELEZA", "CUIDADO", "BEM-ESTAR", "AUTOESTIMA", "AUTOCUIDADO", "MOMENTO PARA VOCÊ",
+            ].map((item) => (
+              <div className="value-item" key={item}><span>{item}</span><i>✦</i></div>
+            ))}
+          </LoopCarousel>
         </section>
 
-        <section id="sobre" className="ns-section ns-about">
-          <div className="ns-container about-grid">
-            <div className="about-visual">
-              <div className="about-image-main">
-                <img src="https://images.unsplash.com/photo-1552693673-1bf958298935?auto=format&fit=crop&w=1100&q=90" alt="Ambiente de estética e autocuidado" loading="lazy" />
-              </div>
-              <div className="about-badge"><span>NS</span><small>Estética</small></div>
-              <div className="about-flower">✦</div>
+        <section id="sobre" className="ns-section ns-how">
+          <div className="ns-container">
+            <SectionTitle eyebrow="Como funciona" title="Seu momento de cuidado, do seu jeito" sub="Tudo começa com a escolha do procedimento. Depois, você reserva o horário e vem viver uma experiência preparada para você." />
+            <div className="how-grid">
+              <article className="how-card"><span>01</span><div className="how-icon"><CalendarDays /></div><h3>Escolha seu cuidado</h3><p>Conheça os procedimentos e encontre aquele que combina com o seu momento.</p></article>
+              <article className="how-card featured"><span>02</span><div className="how-icon"><Clock3 /></div><h3>Reserve seu horário</h3><p>Preencha o formulário de agendamento com seus dados, data e horário desejado.</p></article>
+              <article className="how-card"><span>03</span><div className="how-icon"><Heart /></div><h3>Viva a experiência</h3><p>Chegue e aproveite seu momento de cuidado, beleza e bem-estar.</p></article>
             </div>
-            <div className="about-copy">
-              <span className="ns-eyebrow"><Sparkles size={14} /> Um espaço para você</span>
-              <h2>Cuidar de você é a nossa <em>essência.</em></h2>
-              <p>Na Nildes Souza Estética, cada atendimento é um convite para desacelerar e reservar um tempo para si. Unimos cuidado, beleza e bem-estar em uma experiência acolhedora e personalizada.</p>
-              <p>Do primeiro contato ao final do atendimento, queremos que você se sinta confortável, valorizada e especial.</p>
-              <div className="about-points">
-                <div><span><Heart /></span><b>Cuidado com carinho</b><small>Um atendimento próximo e acolhedor.</small></div>
-                <div><span><Sparkles /></span><b>Beleza em cada detalhe</b><small>Procedimentos pensados para você.</small></div>
-              </div>
-              <Button href="#agendamento">Quero viver essa experiência</Button>
-            </div>
+            <div className="center-cta"><Button href="#agendamento">Quero agendar meu horário</Button></div>
           </div>
         </section>
 
         <section id="procedimentos" className="ns-section ns-procedures">
           <div className="ns-container">
-            <SectionTitle eyebrow="Nossos cuidados" title="Tudo o que você precisa para realçar sua beleza" sub="Escolha seu momento de cuidado e encontre o procedimento que combina com você." />
-            <Marquee label="Procedimentos estéticos" duration={36}>
+            <SectionTitle eyebrow="Nossos cuidados" title="Procedimentos para realçar sua beleza" sub="Escolha seu momento de cuidado e encontre o procedimento que combina com você." />
+            <LoopCarousel duration={38}>
               {procedures.map((item, i) => (
                 <article className="procedure-card" key={item.name}>
                   <div className="procedure-image">
                     <img src={item.image} alt={item.name} loading="lazy" />
-                    <span>0{i + 1}</span>
-                    <button className="procedure-heart" aria-label={`Agendar ${item.name}`} onClick={() => document.getElementById("agendamento")?.scrollIntoView({ behavior: "smooth" })}><Heart size={18} /></button>
+                    <span className="procedure-number">0{i + 1}</span>
+                    <span className="procedure-chip">{item.tag}</span>
                   </div>
                   <div className="procedure-body">
-                    <span className="procedure-eyebrow">{item.eyebrow}</span>
                     <h3>{item.name}</h3>
                     <p>{item.text}</p>
-                    <a href="#agendamento">Agendar <ArrowRight size={15} /></a>
+                    <a href="#agendamento">Agendar este cuidado <ArrowRight size={15} /></a>
                   </div>
                 </article>
               ))}
-            </Marquee>
-            <div className="carousel-hint"><span /> Arraste ou passe o mouse para explorar <span /></div>
+            </LoopCarousel>
+            <div className="carousel-note"><span /> Movimento contínuo <b>•</b> passe o mouse sem interromper <span /></div>
+            <div className="center-cta"><Button href="#agendamento">Agendar meu procedimento</Button></div>
           </div>
         </section>
 
-        <section id="experiencia" className="ns-experience">
-          <div className="ns-container experience-grid">
+        <section className="ns-section ns-experience">
+          <div className="ns-container experience-box">
             <div className="experience-copy">
-              <span className="ns-eyebrow light"><Sparkles size={14} /> Sua experiência</span>
-              <h2>Mais do que um procedimento.<br /><em>Um momento para você.</em></h2>
-              <p>Porque autocuidado não precisa ser corrido. Aqui, cada detalhe foi pensado para que você possa respirar, relaxar e sair se sentindo ainda melhor.</p>
-              <div className="experience-list">
-                <div><span>01</span><p><b>Atendimento personalizado</b><small>Olhar atento às suas necessidades e ao que faz sentido para você.</small></p></div>
-                <div><span>02</span><p><b>Ambiente acolhedor</b><small>Um espaço agradável para transformar seu atendimento em uma pausa especial.</small></p></div>
-                <div><span>03</span><p><b>Cuidado do início ao fim</b><small>Uma experiência pensada nos pequenos detalhes.</small></p></div>
+              <span className="ns-eyebrow"><Sparkles size={14} /> Cuidado em cada detalhe</span>
+              <h2>Uma experiência feita para você <em>se sentir bem.</em></h2>
+              <p>Mais do que escolher um procedimento, você reserva um tempo para desacelerar, se cuidar e valorizar a sua beleza.</p>
+              <div className="experience-points">
+                <div><span>01</span><p><b>Atendimento próximo</b><small>Um olhar atento para tornar seu momento mais especial.</small></p></div>
+                <div><span>02</span><p><b>Ambiente acolhedor</b><small>Leveza, conforto e uma atmosfera pensada para você.</small></p></div>
+                <div><span>03</span><p><b>Beleza com delicadeza</b><small>Procedimentos escolhidos para valorizar seus cuidados pessoais.</small></p></div>
               </div>
-              <Button href="#agendamento" light>Reservar meu momento</Button>
+              <Button href="#agendamento">Reservar meu momento</Button>
             </div>
-            <div className="experience-visual">
-              <div className="experience-photo large"><img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1000&q=90" alt="Mulher em momento de autocuidado" loading="lazy" /></div>
-              <div className="experience-photo small"><img src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b0?auto=format&fit=crop&w=700&q=88" alt="Cuidado de pele" loading="lazy" /></div>
-              <div className="experience-stamp"><Star size={15} fill="currentColor" /><span>Seu cuidado<br /><b>merece atenção</b></span></div>
+            <div className="experience-quote">
+              <div className="quote-mark">“</div>
+              <p>Seu tempo também merece ser cuidado.</p>
+              <span>Nildes Souza Estética</span>
             </div>
           </div>
         </section>
 
-        <section className="ns-benefits ns-section">
+        <section className="ns-section ns-why">
           <div className="ns-container">
-            <SectionTitle eyebrow="Por que escolher a Nildes" title="Um cuidado pensado nos detalhes" sub="Tudo para você se sentir bem, acolhida e confiante em cada visita." />
-            <div className="benefit-grid">
-              <article><span><Heart /></span><h3>Atendimento acolhedor</h3><p>Um olhar cuidadoso para tornar cada visita mais leve e especial.</p></article>
-              <article><span><Sparkles /></span><h3>Experiência personalizada</h3><p>Procedimentos e cuidados escolhidos para valorizar o que você busca.</p></article>
-              <article><span><Check /></span><h3>Profissionalismo</h3><p>Organização, atenção e cuidado em todos os detalhes do atendimento.</p></article>
-              <article><span><Star /></span><h3>Momento de autocuidado</h3><p>Uma pausa na rotina para cuidar da beleza e do bem-estar.</p></article>
+            <SectionTitle eyebrow="Por que escolher a Nildes" title="Cuidado que você percebe nos detalhes" sub="Uma experiência acolhedora, delicada e pensada para fazer você se sentir especial." />
+            <div className="why-grid">
+              <article><div className="why-icon"><Heart /></div><h3>Atendimento acolhedor</h3><p>Você é recebida com atenção, respeito e carinho em cada etapa.</p></article>
+              <article><div className="why-icon"><Sparkles /></div><h3>Experiência personalizada</h3><p>Seu momento de cuidado merece atenção aos detalhes e ao que você procura.</p></article>
+              <article><div className="why-icon"><Check /></div><h3>Ambiente confortável</h3><p>Um espaço pensado para deixar sua experiência mais leve e agradável.</p></article>
+              <article><div className="why-icon"><Star /></div><h3>Cuidado com propósito</h3><p>Beleza e bem-estar caminhando juntos em uma experiência especial.</p></article>
             </div>
+            <div className="center-cta"><Button href="#agendamento">Agendar meu horário</Button></div>
           </div>
         </section>
 
-        <section className="ns-quote">
-          <div className="ns-container quote-inner">
-            <span className="quote-mark">“</span>
-            <h2>Presenteie-se com saúde,<br /><em>relaxamento e autoestima.</em></h2>
-            <p>Seu tempo também importa.</p>
-            <div className="quote-line" />
-          </div>
-        </section>
-
-        <section className="ns-reviews ns-section">
+        <section className="ns-section ns-reviews">
           <div className="ns-container">
-            <SectionTitle eyebrow="Experiências" title="Quem vive, sente a diferença" sub="Algumas palavras de quem já reservou um momento para si." />
-            <Marquee label="Depoimentos" duration={31}>
+            <SectionTitle eyebrow="Experiências" title="Quem vive, recomenda" sub="Alguns sentimentos que queremos que façam parte de cada atendimento." />
+            <LoopCarousel duration={34}>
               {reviews.map(([name, text]) => (
                 <article className="review-card" key={name}>
-                  <div className="review-stars">★★★★★</div>
+                  <div className="review-stars">{[1, 2, 3, 4, 5].map((star) => <Star key={star} size={15} fill="currentColor" />)}</div>
                   <p>“{text}”</p>
-                  <div className="review-person"><span>{name.charAt(0)}</span><b>{name}</b><small>Cliente</small></div>
+                  <div className="review-person"><span>{name.charAt(0)}</span><div><strong>{name}</strong><small>Cliente Nildes Souza Estética</small></div></div>
                 </article>
               ))}
-            </Marquee>
+            </LoopCarousel>
+            <div className="center-cta"><Button href="#agendamento">Quero viver essa experiência</Button></div>
           </div>
         </section>
 
-        <section id="agendamento" className="ns-booking">
-          <div className="ns-container booking-card">
-            <div className="booking-copy">
-              <span className="ns-eyebrow"><CalendarDays size={14} /> Agendamento</span>
-              <h2>Seu momento começa com um <em>horário reservado.</em></h2>
-              <p>Escolha seu procedimento e reserve seu atendimento de forma simples. Esta área está preparada para receber a integração com o Google Agenda.</p>
-              <div className="booking-info"><span><Clock3 size={17} /> Agendamento online</span><span><Check size={17} /> Atendimento personalizado</span></div>
+        <section className="ns-location">
+          <div className="ns-container location-grid">
+            <div className="location-copy">
+              <span className="ns-eyebrow"><MapPin size={14} /> Onde estamos</span>
+              <h2>Seu próximo momento de cuidado fica <em>aqui.</em></h2>
+              <p>Rua das Gaivotas, 196 — Imbuí Center, Sala 101, ao lado da Subway, Salvador - BA.</p>
+              <div className="location-detail"><MapPin /><div><b>Imbuí Center</b><span>Sala 101 • ao lado da Subway</span></div></div>
+              <div className="location-actions"><Button href={mapUrl}>Abrir no Google Maps</Button><Button href="#agendamento" light>Agendar horário</Button></div>
             </div>
-            <div className="booking-action">
-              <div className="calendar-icon"><CalendarDays /></div>
-              <h3>Agende seu horário</h3>
-              <p>Em breve, você poderá escolher a data e o horário diretamente por aqui.</p>
-              <Button href={wa} whatsapp>Agendar pelo WhatsApp</Button>
-              <small>Enquanto a agenda online é configurada, fale conosco pelo WhatsApp.</small>
+            <div className="map-frame">
+              <iframe title="Localização da Nildes Souza Estética no Imbuí" src="https://www.google.com/maps?q=Rua+das+Gaivotas,+196,+Imbui+Center,+Sala+101,+Salvador,+BA&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+              <div className="map-label"><MapPin size={16} /><span>Nildes Souza Estética</span></div>
             </div>
           </div>
         </section>
 
-        <section id="duvidas" className="ns-faq ns-section">
+        <section id="duvidas" className="ns-section ns-faq">
           <div className="ns-container faq-grid">
-            <div className="faq-intro">
-              <span className="ns-eyebrow"><Sparkles size={14} /> Dúvidas frequentes</span>
-              <h2>Tudo mais simples para você.</h2>
-              <p>Confira algumas respostas rápidas. Se ainda tiver alguma dúvida, nossa equipe está à disposição.</p>
-              <Button href={wa} whatsapp>Falar no WhatsApp</Button>
+            <div>
+              <SectionTitle eyebrow="Perguntas frequentes" title="Tudo mais simples antes do seu horário" sub="Confira as respostas para as dúvidas mais comuns." />
+              <Button href="#agendamento">Ainda tenho dúvidas — agendar</Button>
             </div>
             <div className="faq-list">
-              {faqs.map((q, i) => (
-                <div className={`faq-item ${faq === i ? "open" : ""}`} key={q}>
-                  <button onClick={() => setFaq(faq === i ? null : i)} aria-expanded={faq === i}>
-                    <span>0{i + 1}</span><b>{q}</b><ChevronDown />
+              {faqs.map(([question, answer], index) => (
+                <div className={`faq-item ${openFaq === index ? "open" : ""}`} key={question}>
+                  <button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} aria-expanded={openFaq === index}>
+                    <span>{question}</span><ChevronDown size={19} />
                   </button>
-                  {faq === i && <p>Fale com nossa equipe pelo WhatsApp para receber as orientações e informações sobre seu atendimento.</p>}
+                  <div className="faq-answer"><p>{answer}</p></div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section id="contato" className="ns-contact">
-          <div className="ns-container contact-grid">
-            <div className="contact-copy">
-              <span className="ns-eyebrow"><MapPin size={14} /> Visite a Nildes Souza Estética</span>
-              <Brand />
-              <h2>Seu próximo momento de cuidado está aqui.</h2>
-              <p>Tudo o que você precisa para realçar sua beleza, em um espaço acolhedor no Imbuí.</p>
-              <div className="contact-details">
-                <a href={mapUrl} target="_blank" rel="noreferrer"><MapPin /> <span><b>Rua das Gaivotas, 196</b><small>Imbuí Center, Sala 101 · Ao lado da Subway</small></span></a>
-                <a href={wa} target="_blank" rel="noreferrer"><MessageCircle /> <span><b>(71) 98129-4334</b><small>Fale conosco pelo WhatsApp</small></span></a>
-                <a href={instagramUrl} target="_blank" rel="noreferrer"><Instagram /> <span><b>@nildes.estetica</b><small>Acompanhe no Instagram</small></span></a>
-              </div>
-              <Button href={mapUrl}>Como chegar</Button>
+        <section id="agendamento" className="ns-section ns-booking">
+          <div className="ns-container booking-shell">
+            <div className="booking-heading">
+              <span className="ns-eyebrow"><CalendarDays size={14} /> Agendamento online</span>
+              <h2>Reserve seu momento de <em>cuidado.</em></h2>
+              <p>Preencha os dados abaixo para solicitar seu horário. Escolha o tratamento, a data e o melhor horário para você.</p>
             </div>
-            <div className="contact-map">
-              <div className="map-card">
-                <div className="map-pattern" />
-                <div className="map-pin"><MapPin size={26} /></div>
-                <div className="map-label"><b>Imbuí Center</b><span>Rua das Gaivotas, 196 · Sala 101</span></div>
-                <a href={mapUrl} target="_blank" rel="noreferrer">Abrir no Google Maps <ArrowUpRight size={15} /></a>
+            <form className="booking-form" onSubmit={handleSubmit}>
+              <div className="form-grid">
+                <label><span>Nome completo</span><input name="name" required placeholder="Digite seu nome" /></label>
+                <label><span>Telefone</span><input name="phone" required type="tel" placeholder="(71) 99999-9999" /></label>
+                <label><span>Tratamento</span><select name="treatment" required defaultValue=""><option value="" disabled>Selecione um tratamento</option><option>Auriculoterapia</option><option>Design de Sobrancelhas</option><option>Limpeza de Pele</option><option>Peeling</option><option>Ventosaterapia</option><option>Massagem Relaxante</option></select></label>
+                <label><span>Data</span><input name="date" required type="date" /></label>
               </div>
-            </div>
+              <div className="form-section-title"><Clock3 size={17} /> Horários disponíveis</div>
+              <div className="time-grid">
+                {["15:00", "16:00", "17:00", "18:00"].map((time) => <label key={time}><input type="radio" name="time" value={time} required /><span>{time}</span></label>)}
+              </div>
+              <label className="full-field"><span>Observações <small>(opcional)</small></span><textarea name="notes" rows={4} placeholder="Conte algo que gostaria que soubéssemos..." /></label>
+              <button className="booking-submit" type="submit"><CalendarDays size={18} /> Solicitar agendamento <ArrowRight size={17} /></button>
+              {submitted && <div className="booking-success"><Check size={19} /><div><b>Solicitação preparada!</b><span>O WhatsApp foi aberto com seus dados para confirmar o atendimento. A sincronização direta com o Google Agenda poderá ser conectada na próxima etapa.</span></div></div>}
+              <p className="booking-note">Seus dados serão usados para organizar seu atendimento. A integração com o Google Agenda pode ser conectada posteriormente para automatizar a disponibilidade e a confirmação dos horários.</p>
+            </form>
+          </div>
+        </section>
+
+        <section className="ns-final-cta">
+          <div className="ns-container final-inner">
+            <span className="ns-eyebrow"><Sparkles size={14} /> Nildes Souza Estética</span>
+            <h2>Seu momento de cuidado <em>começa aqui.</em></h2>
+            <p>Tudo o que você precisa para realçar sua beleza.</p>
+            <Button href="#agendamento">Agendar meu horário</Button>
           </div>
         </section>
       </main>
 
       <footer className="ns-footer">
-        <div className="ns-container footer-top">
-          <div className="footer-brand"><Brand /><p>Tudo o que você precisa para realçar sua beleza.</p></div>
-          <div><h3>Navegação</h3>{navLinks.slice(0, 5).map(([label, href]) => <a key={label} href={href}>{label}</a>)}</div>
-          <div><h3>Procedimentos</h3>{procedures.slice(0, 5).map((p) => <a key={p.name} href="#procedimentos">{p.name}</a>)}</div>
-          <div><h3>Contato</h3><a href={wa} target="_blank" rel="noreferrer"><MessageCircle /> (71) 98129-4334</a><a href={instagramUrl} target="_blank" rel="noreferrer"><Instagram /> @nildes.estetica</a><span><MapPin /> Imbuí Center · Sala 101</span></div>
+        <div className="ns-container footer-grid">
+          <div><Brand /><p>Beleza, cuidado e bem-estar em uma experiência feita para você.</p></div>
+          <div><strong>Atalhos</strong><a href="#inicio">Início</a><a href="#procedimentos">Procedimentos</a><a href="#duvidas">Dúvidas</a><a href="#agendamento">Agendamento</a></div>
+          <div><strong>Contato</strong><a href={mapUrl} target="_blank" rel="noreferrer"><MapPin size={15} /> Rua das Gaivotas, 196 — Imbuí Center</a><a href={wa} target="_blank" rel="noreferrer"><MessageCircle size={15} /> (71) 98129-4334</a><a href={instagramUrl} target="_blank" rel="noreferrer"><Instagram size={15} /> @nildes.estetica</a></div>
         </div>
-        <div className="ns-container footer-bottom"><span>© 2026 Nildes Souza Estética. Todos os direitos reservados.</span><span>Beleza · Cuidado · Bem-estar</span></div>
+        <div className="ns-container footer-bottom"><span>© {new Date().getFullYear()} Nildes Souza Estética. Todos os direitos reservados.</span><span>Salvador • BA</span></div>
       </footer>
 
-      <a className="floating-wa" href={wa} target="_blank" rel="noreferrer" aria-label="Falar com a Nildes Souza Estética pelo WhatsApp">
-        <MessageCircle size={29} />
+      <a className="floating-whatsapp" href={wa} target="_blank" rel="noreferrer" aria-label="Falar com a Nildes Souza Estética pelo WhatsApp">
+        <MessageCircle size={27} strokeWidth={2.2} />
         <span>Fale conosco</span>
       </a>
     </div>
