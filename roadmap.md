@@ -14,4 +14,7 @@
 - [x] Oferecer horários de 09:00 a 17:00, respeitando o encerramento às 18:00.
 - [x] Bloquear solicitações para domingo e segunda-feira.
 - [x] Enviar a solicitação preenchida ao WhatsApp da clínica para confirmação.
+- [x] Atualizar o retrato de Nildes e posicioná-lo abaixo do título, sem texto sobre a imagem.
+- [x] Atualizar as imagens de Peeling e Design de Sobrancelhas.
+- [x] Mostrar a confirmação do agendamento antes de abrir a mensagem pronta no WhatsApp.
 - [ ] Integrar o agendamento ao Google Agenda — adiado a pedido da cliente.
