@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { defaultWeeklyHours, dayNames, getBookingConfig, type WeekdayHours } from "@/lib/schedule.functions";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -53,17 +56,21 @@ const procedures = [
   { name: "Clareamento de Virilhas, Axilas e Face", tag: "Tom mais uniforme", text: "Cuidado estético para ajudar a uniformizar a aparência da pele e valorizar sua autoestima.", image: brighteningAsset.url },
 ] as const;
 
-const openingHours = [
-  ["Domingo", "Fechada"],
-  ["Segunda-feira", "Fechada"],
-  ["Terça-feira", "09:00 – 18:00"],
-  ["Quarta-feira", "09:00 – 18:00"],
-  ["Quinta-feira", "09:00 – 18:00"],
-  ["Sexta-feira", "09:00 – 18:00"],
-  ["Sábado", "09:00 – 18:00"],
-] as const;
+const fallbackSlots = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] as const;
 
-const appointmentTimes = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] as const;
+function toMinutes(time: string) {
+  const parts = time.split(":").map(Number);
+  return parts[0]! * 60 + (parts[1] ?? 0);
+}
+
+function slotsFromHours(hours: WeekdayHours | undefined): string[] {
+  if (!hours || hours.closed) return [];
+  const slots: string[] = [];
+  for (let m = toMinutes(hours.start); m + 60 <= toMinutes(hours.end); m += 60) {
+    slots.push(`${String(Math.floor(m / 60)).padStart(2, "0")}:00`);
+  }
+  return slots;
+}
 
 const reviews = [
   ["Mariana", "Um atendimento acolhedor e um espaço muito bonito. Saí me sentindo ainda melhor."],
@@ -103,6 +110,37 @@ function Index() {
   const [submitted, setSubmitted] = useState(false);
   const [bookingError, setBookingError] = useState("");
   const [confirmationUrl, setConfirmationUrl] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+
+  const fetchBookingConfig = useServerFn(getBookingConfig);
+  const { data: bookingConfig } = useQuery({ queryKey: ["booking-config"], queryFn: () => fetchBookingConfig() });
+  const weeklyHours = bookingConfig?.weeklyHours ?? defaultWeeklyHours;
+  const dayBlocks = useMemo(
+    () => (bookingConfig?.blocks ?? []).filter((b) => b.block_date === selectedDate),
+    [bookingConfig, selectedDate],
+  );
+
+  const availableSlots = useMemo(() => {
+    if (!selectedDate) {
+      const firstOpen = weeklyHours.find((h) => !h.closed);
+      const slots = slotsFromHours(firstOpen);
+      return slots.length ? slots : [...fallbackSlots];
+    }
+    const day = new Date(`${selectedDate}T12:00:00`).getDay();
+    const slots = slotsFromHours(weeklyHours.find((h) => h.weekday === day));
+    if (!slots.length) return [];
+    if (dayBlocks.some((b) => b.full_day)) return [];
+    let filtered = slots;
+    for (const b of dayBlocks) {
+      const bs = b.start_time;
+      const be = b.end_time;
+      if (bs && be) {
+        filtered = filtered.filter((s) => toMinutes(s) + 60 <= toMinutes(bs) || toMinutes(s) >= toMinutes(be));
+      }
+    }
+    return filtered;
+  }, [selectedDate, weeklyHours, dayBlocks]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -111,14 +149,30 @@ function Index() {
     const phone = String(form.get("phone") || "");
     const treatment = String(form.get("treatment") || "");
     const date = String(form.get("date") || "");
-    const time = String(form.get("time") || "");
+    const time = selectedTime;
     const notes = String(form.get("notes") || "");
-    const selectedDate = new Date(`${date}T12:00:00`);
-    const selectedDay = selectedDate.getDay();
-    if (Number.isNaN(selectedDate.getTime()) || selectedDay === 0 || selectedDay === 1) {
+    const selectedDateObj = new Date(`${date}T12:00:00`);
+    const selectedDay = selectedDateObj.getDay();
+    const dayHours = weeklyHours.find((h) => h.weekday === selectedDay);
+    function fail(message: string) {
       setSubmitted(false);
       setConfirmationUrl("");
-      setBookingError("Escolha uma data entre terça-feira e sábado. Domingo e segunda-feira não há atendimento.");
+      setBookingError(message);
+    }
+    if (Number.isNaN(selectedDateObj.getTime()) || !dayHours || dayHours.closed) {
+      fail(
+        Number.isNaN(selectedDateObj.getTime())
+          ? "Escolha uma data válida para o agendamento."
+          : `Escolha outra data: ${dayNames[selectedDay]} não tem atendimento. Confira os horários de funcionamento.`,
+      );
+      return;
+    }
+    if (dayBlocks.some((b) => b.full_day)) {
+      fail("Essa data está com os atendimentos fechados. Escolha outra data.");
+      return;
+    }
+    if (!time || !availableSlots.includes(time)) {
+      fail("Esse horário ficou indisponível nesta data. Escolha outro horário.");
       return;
     }
     const message = `Olá! Quero solicitar um agendamento na Nildes Souza Estética.%0A%0ANome: ${encodeURIComponent(name)}%0ATelefone: ${encodeURIComponent(phone)}%0ATratamento: ${encodeURIComponent(treatment)}%0AData: ${encodeURIComponent(date)}%0AHorário: ${encodeURIComponent(time)}%0AObservações: ${encodeURIComponent(notes || "Nenhuma")}`;
@@ -148,7 +202,7 @@ function Index() {
 
     <section id="duvidas" className="ns-section ns-faq"><div className="ns-container faq-grid"><div><SectionTitle eyebrow="Perguntas frequentes" title="Tudo mais simples antes do seu horário" sub="Confira as respostas para as dúvidas mais comuns." /><Button href="#agendamento">Ainda tenho dúvidas — agendar</Button></div><div className="faq-list">{faqs.map(([question, answer], index) => <div className={`faq-item ${openFaq === index ? "open" : ""}`} key={question}><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} aria-expanded={openFaq === index}><span>{question}</span><ChevronDown size={19} /></button><div className="faq-answer"><p>{answer}</p></div></div>)}</div></div></section>
 
-    <section id="agendamento" className="ns-section ns-booking"><div className="ns-container booking-shell"><div className="booking-intro"><div className="booking-heading"><span className="ns-eyebrow"><CalendarDays size={14} /> Agendamento online</span><h2>Reserve seu momento de <em>cuidado.</em></h2><p>Preencha os dados para solicitar seu horário. Ao finalizar, enviaremos a solicitação pelo WhatsApp para a clínica confirmar.</p></div><aside className="opening-hours" aria-label="Horário de atendimento"><div className="opening-hours-title"><Clock3 size={18} /><div><strong>Horário de atendimento</strong><span>Terça a sábado</span></div></div><div className="opening-hours-list">{openingHours.map(([day, hours]) => <div className={hours === "Fechada" ? "closed" : ""} key={day}><span>{day}</span><b>{hours}</b></div>)}</div></aside></div><form className="booking-form" onSubmit={handleSubmit}><div className="form-grid"><label><span>Nome completo</span><input name="name" required placeholder="Digite seu nome" /></label><label><span>Telefone</span><input name="phone" required type="tel" placeholder="(71) 99999-9999" /></label><label><span>Tratamento</span><select name="treatment" required defaultValue=""><option value="" disabled>Selecione um tratamento</option><option>Auriculoterapia</option><option>Design de Sobrancelhas</option><option>Limpeza de Pele</option><option>Peeling</option><option>Ventosaterapia</option><option>Massagem Relaxante</option><option>Clareamento de Virilhas, Axilas e Face</option></select></label><label><span>Data <small>(terça a sábado)</small></span><input name="date" required type="date" onChange={() => { setBookingError(""); setSubmitted(false); }} /></label></div><div className="form-section-title"><Clock3 size={17} /> Horários disponíveis</div><div className="time-grid">{appointmentTimes.map((time) => <label key={time}><input type="radio" name="time" value={time} required /><span>{time}</span></label>)}</div><label className="full-field"><span>Observações <small>(opcional)</small></span><textarea name="notes" rows={4} placeholder="Conte algo que gostaria que soubéssemos..." /></label>{bookingError && <div className="booking-error" role="alert"><CalendarDays size={18} /><span>{bookingError}</span></div>}<button className="booking-submit" type="submit"><CalendarDays size={18} /> Agendar agora <ArrowRight size={17} /></button><p className="booking-note">O horário só estará reservado após a confirmação da clínica pelo WhatsApp.</p></form></div></section>
+    <section id="agendamento" className="ns-section ns-booking"><div className="ns-container booking-shell"><div className="booking-intro"><div className="booking-heading"><span className="ns-eyebrow"><CalendarDays size={14} /> Agendamento online</span><h2>Reserve seu momento de <em>cuidado.</em></h2><p>Preencha os dados para solicitar seu horário. Ao finalizar, enviaremos a solicitação pelo WhatsApp para a clínica confirmar.</p></div><aside className="opening-hours" aria-label="Horário de atendimento"><div className="opening-hours-title"><Clock3 size={18} /><div><strong>Horário de atendimento</strong><span>Atualizado pela clínica</span></div></div><div className="opening-hours-list">{[...weeklyHours].sort((a, b) => a.weekday - b.weekday).map((h) => <div className={h.closed ? "closed" : ""} key={h.weekday}><span>{dayNames[h.weekday]}</span><b>{h.closed ? "Fechada" : `${h.start} – ${h.end}`}</b></div>)}</div></aside></div><form className="booking-form" onSubmit={handleSubmit}><div className="form-grid"><label><span>Nome completo</span><input name="name" required placeholder="Digite seu nome" /></label><label><span>Telefone</span><input name="phone" required type="tel" placeholder="(71) 99999-9999" /></label><label><span>Tratamento</span><select name="treatment" required defaultValue=""><option value="" disabled>Selecione um tratamento</option><option>Auriculoterapia</option><option>Design de Sobrancelhas</option><option>Limpeza de Pele</option><option>Peeling</option><option>Ventosaterapia</option><option>Massagem Relaxante</option><option>Clareamento de Virilhas, Axilas e Face</option></select></label><label><span>Data <small>(veja os dias disponíveis)</small></span><input name="date" required type="date" value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); setSelectedTime(""); setBookingError(""); setSubmitted(false); }} /></label></div><div className="form-section-title"><Clock3 size={17} /> Horários disponíveis</div><div className="time-grid">{availableSlots.length ? availableSlots.map((time) => <label key={time}><input type="radio" name="time" value={time} checked={selectedTime === time} onChange={() => setSelectedTime(time)} /><span>{time}</span></label>) : <p className="slots-empty">Não há horários disponíveis nesta data — escolha outra.</p>}</div><label className="full-field"><span>Observações <small>(opcional)</small></span><textarea name="notes" rows={4} placeholder="Conte algo que gostaria que soubéssemos..." /></label>{bookingError && <div className="booking-error" role="alert"><CalendarDays size={18} /><span>{bookingError}</span></div>}<button className="booking-submit" type="submit"><CalendarDays size={18} /> Agendar agora <ArrowRight size={17} /></button><p className="booking-note">O horário só estará reservado após a confirmação da clínica pelo WhatsApp.</p></form></div></section>
 
     <section className="ns-final-cta"><div className="ns-container final-inner"><span className="ns-eyebrow"><Sparkles size={14} /> Nildes Souza Estética</span><h2>Seu momento de cuidado <em>começa aqui.</em></h2><p>Tudo o que você precisa para realçar sua beleza.</p><Button href="#agendamento">Agendar meu horário</Button></div></section>
   </main>

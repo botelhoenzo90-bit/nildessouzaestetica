@@ -17,4 +17,6 @@
 - [x] Atualizar o retrato de Nildes e posicioná-lo abaixo do título, sem texto sobre a imagem.
 - [x] Atualizar as imagens de Peeling e Design de Sobrancelhas.
 - [x] Mostrar a confirmação do agendamento antes de abrir a mensagem pronta no WhatsApp.
+- [x] Criar área de admin no site (login nildes2026) para editar horários semanais e bloquear dias ou períodos.
+- [x] Fazer o agendamento do site ler os horários e bloqueios salvos no painel.
 - [ ] Integrar o agendamento ao Google Agenda — adiado a pedido da cliente.
