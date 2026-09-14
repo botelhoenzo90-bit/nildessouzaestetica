@@ -59,8 +59,8 @@ const procedures = [
 const fallbackSlots = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] as const;
 
 function toMinutes(time: string) {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
+  const parts = time.split(":").map(Number);
+  return parts[0]! * 60 + (parts[1] ?? 0);
 }
 
 function slotsFromHours(hours: WeekdayHours | undefined): string[] {
@@ -110,6 +110,37 @@ function Index() {
   const [submitted, setSubmitted] = useState(false);
   const [bookingError, setBookingError] = useState("");
   const [confirmationUrl, setConfirmationUrl] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+
+  const fetchBookingConfig = useServerFn(getBookingConfig);
+  const { data: bookingConfig } = useQuery({ queryKey: ["booking-config"], queryFn: () => fetchBookingConfig() });
+  const weeklyHours = bookingConfig?.weeklyHours ?? defaultWeeklyHours;
+  const dayBlocks = useMemo(
+    () => (bookingConfig?.blocks ?? []).filter((b) => b.block_date === selectedDate),
+    [bookingConfig, selectedDate],
+  );
+
+  const availableSlots = useMemo(() => {
+    if (!selectedDate) {
+      const firstOpen = weeklyHours.find((h) => !h.closed);
+      const slots = slotsFromHours(firstOpen);
+      return slots.length ? slots : [...fallbackSlots];
+    }
+    const day = new Date(`${selectedDate}T12:00:00`).getDay();
+    const slots = slotsFromHours(weeklyHours.find((h) => h.weekday === day));
+    if (!slots.length) return [];
+    if (dayBlocks.some((b) => b.full_day)) return [];
+    let filtered = slots;
+    for (const b of dayBlocks) {
+      const bs = b.start_time;
+      const be = b.end_time;
+      if (bs && be) {
+        filtered = filtered.filter((s) => toMinutes(s) + 60 <= toMinutes(bs) || toMinutes(s) >= toMinutes(be));
+      }
+    }
+    return filtered;
+  }, [selectedDate, weeklyHours, dayBlocks]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -118,14 +149,30 @@ function Index() {
     const phone = String(form.get("phone") || "");
     const treatment = String(form.get("treatment") || "");
     const date = String(form.get("date") || "");
-    const time = String(form.get("time") || "");
+    const time = selectedTime;
     const notes = String(form.get("notes") || "");
-    const selectedDate = new Date(`${date}T12:00:00`);
-    const selectedDay = selectedDate.getDay();
-    if (Number.isNaN(selectedDate.getTime()) || selectedDay === 0 || selectedDay === 1) {
+    const selectedDateObj = new Date(`${date}T12:00:00`);
+    const selectedDay = selectedDateObj.getDay();
+    const dayHours = weeklyHours.find((h) => h.weekday === selectedDay);
+    function fail(message: string) {
       setSubmitted(false);
       setConfirmationUrl("");
-      setBookingError("Escolha uma data entre terça-feira e sábado. Domingo e segunda-feira não há atendimento.");
+      setBookingError(message);
+    }
+    if (Number.isNaN(selectedDateObj.getTime()) || !dayHours || dayHours.closed) {
+      fail(
+        Number.isNaN(selectedDateObj.getTime())
+          ? "Escolha uma data válida para o agendamento."
+          : `Escolha outra data: ${dayNames[selectedDay]} não tem atendimento. Confira os horários de funcionamento.`,
+      );
+      return;
+    }
+    if (dayBlocks.some((b) => b.full_day)) {
+      fail("Essa data está com os atendimentos fechados. Escolha outra data.");
+      return;
+    }
+    if (!time || !availableSlots.includes(time)) {
+      fail("Esse horário ficou indisponível nesta data. Escolha outro horário.");
       return;
     }
     const message = `Olá! Quero solicitar um agendamento na Nildes Souza Estética.%0A%0ANome: ${encodeURIComponent(name)}%0ATelefone: ${encodeURIComponent(phone)}%0ATratamento: ${encodeURIComponent(treatment)}%0AData: ${encodeURIComponent(date)}%0AHorário: ${encodeURIComponent(time)}%0AObservações: ${encodeURIComponent(notes || "Nenhuma")}`;
