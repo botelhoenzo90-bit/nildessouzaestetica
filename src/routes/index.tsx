@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { defaultWeeklyHours, dayNames, getBookingConfig, type WeekdayHours } from "@/lib/schedule.functions";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -53,17 +56,21 @@ const procedures = [
   { name: "Clareamento de Virilhas, Axilas e Face", tag: "Tom mais uniforme", text: "Cuidado estético para ajudar a uniformizar a aparência da pele e valorizar sua autoestima.", image: brighteningAsset.url },
 ] as const;
 
-const openingHours = [
-  ["Domingo", "Fechada"],
-  ["Segunda-feira", "Fechada"],
-  ["Terça-feira", "09:00 – 18:00"],
-  ["Quarta-feira", "09:00 – 18:00"],
-  ["Quinta-feira", "09:00 – 18:00"],
-  ["Sexta-feira", "09:00 – 18:00"],
-  ["Sábado", "09:00 – 18:00"],
-] as const;
+const fallbackSlots = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] as const;
 
-const appointmentTimes = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] as const;
+function toMinutes(time: string) {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function slotsFromHours(hours: WeekdayHours | undefined): string[] {
+  if (!hours || hours.closed) return [];
+  const slots: string[] = [];
+  for (let m = toMinutes(hours.start); m + 60 <= toMinutes(hours.end); m += 60) {
+    slots.push(`${String(Math.floor(m / 60)).padStart(2, "0")}:00`);
+  }
+  return slots;
+}
 
 const reviews = [
   ["Mariana", "Um atendimento acolhedor e um espaço muito bonito. Saí me sentindo ainda melhor."],
