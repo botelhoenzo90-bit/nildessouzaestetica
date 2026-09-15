@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
-import { CalendarDays, Clock3, CreditCard, ExternalLink, LogOut, Tag, Trash2 } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock3, CreditCard, ExternalLink, LogOut, Tag, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   adminGetSchedule,
@@ -13,8 +13,11 @@ import {
   adminAddService,
   adminDeleteService,
   adminSavePayment,
+  adminListAppointments,
+  adminSetAppointmentPaid,
+  adminDeleteAppointment,
 } from "@/lib/admin.functions";
-import { categoryLabels, dayNames, formatPrice, type Service, type WeekdayHours } from "@/lib/schedule.functions";
+import { categoryLabels, dayNames, formatPrice, type Appointment, type Service, type WeekdayHours } from "@/lib/schedule.functions";
 import logoAsset from "@/assets/logo-nildes-souza.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -38,8 +41,13 @@ function AdminPage() {
   const addServiceFn = useServerFn(adminAddService);
   const deleteServiceFn = useServerFn(adminDeleteService);
   const savePaymentFn = useServerFn(adminSavePayment);
+  const listAppointmentsFn = useServerFn(adminListAppointments);
+  const setAppointmentPaidFn = useServerFn(adminSetAppointmentPaid);
+  const deleteAppointmentFn = useServerFn(adminDeleteAppointment);
 
   const { data, isLoading } = useQuery({ queryKey: ["admin-schedule"], queryFn: () => getSchedule() });
+  const { data: apptData } = useQuery({ queryKey: ["admin-appointments"], queryFn: () => listAppointmentsFn() });
+  const appointments: Appointment[] = apptData?.allowed ? apptData.appointments : [];
 
   const [hours, setHours] = useState<WeekdayHours[]>([]);
   const [saveMsg, setSaveMsg] = useState("");
@@ -187,6 +195,16 @@ function AdminPage() {
   async function handleDeleteService(id: string) {
     await deleteServiceFn({ data: { id } });
     await refreshAll();
+  }
+
+  async function handleToggleAppointmentPaid(id: string, paid: boolean) {
+    await setAppointmentPaidFn({ data: { id, paid } });
+    await queryClient.invalidateQueries({ queryKey: ["admin-appointments"] });
+  }
+
+  async function handleDeleteAppointment(id: string) {
+    await deleteAppointmentFn({ data: { id } });
+    await queryClient.invalidateQueries({ queryKey: ["admin-appointments"] });
   }
 
   async function handleSavePayment() {
