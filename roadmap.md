@@ -24,7 +24,6 @@
 - [x] Acrescentar a ficha de anamnese ao formulário.
 - [x] Mostrar o sinal de 40% e o botão do Mercado Pago antes da confirmação no WhatsApp.
 - [x] Editar procedimentos, valores, porcentagem do sinal e link de pagamento no painel.
-- [x] Lista de agendamentos no painel: cada pedido do site entra como "pendente" e a clínica marca "pago" quando o comprovante do sinal chega no WhatsApp.
+- [x] Agendamentos vão direto para a Google Agenda da clínica como "PENDENTE" (amarelo); a lista de agendamentos no painel foi removida para não usar banco de dados.
 - [ ] Informar o valor do Brow Lamination (hoje está R$ 0,00 no painel).
-- [ ] Integrar o agendamento à Google Agenda (adiado a pedido da cliente).
-- Modelo acordado: agendamento entra na agenda como PENDENTE (cor diferente); no painel ela marca "pago" ao receber o comprovante no WhatsApp e o evento fica confirmado.
+- [x] Google Agenda integrada (conta nildes.estetica@gmail.com). O controle de pago é feito na própria agenda: ela edita o evento (título "PAGO" e cor verde).
