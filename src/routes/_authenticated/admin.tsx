@@ -146,6 +146,62 @@ function AdminPage() {
     queryClient.invalidateQueries({ queryKey: ["booking-config"] });
   }
 
+  function updateService(id: string, patch: Partial<Service>) {
+    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  }
+
+  async function refreshAll() {
+    await queryClient.invalidateQueries({ queryKey: ["admin-schedule"] });
+    queryClient.invalidateQueries({ queryKey: ["booking-config"] });
+  }
+
+  async function handleSaveServices() {
+    setServicesError("");
+    setServicesMsg("");
+    const result = await saveServicesFn({ data: { services } });
+    if (result.ok) {
+      setServicesMsg("Procedimentos e valores salvos!");
+      await refreshAll();
+      setTimeout(() => setServicesMsg(""), 5000);
+    } else {
+      setServicesError(result.message ?? "Não foi possível salvar.");
+    }
+  }
+
+  async function handleAddService(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setServicesError("");
+    const cents = Math.round(Number(newPrice.replace(",", ".")) * 100);
+    const result = await addServiceFn({
+      data: { name: newName, category: newCategory, description: null, price_cents: Number.isFinite(cents) ? cents : 0 },
+    });
+    if (result.ok) {
+      setNewName("");
+      setNewPrice("");
+      await refreshAll();
+    } else {
+      setServicesError(result.message ?? "Não foi possível adicionar.");
+    }
+  }
+
+  async function handleDeleteService(id: string) {
+    await deleteServiceFn({ data: { id } });
+    await refreshAll();
+  }
+
+  async function handleSavePayment() {
+    setPaymentError("");
+    setPaymentMsg("");
+    const result = await savePaymentFn({ data: { depositPercent, paymentLink } });
+    if (result.ok) {
+      setPaymentMsg("Pagamento atualizado!");
+      await refreshAll();
+      setTimeout(() => setPaymentMsg(""), 5000);
+    } else {
+      setPaymentError(result.message ?? "Não foi possível salvar.");
+    }
+  }
+
   async function handleSignOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
