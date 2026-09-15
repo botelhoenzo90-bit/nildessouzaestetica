@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { defaultWeeklyHours, dayNames, getBookingConfig, type WeekdayHours } from "@/lib/schedule.functions";
+import { categoryLabels, defaultPaymentLink, defaultWeeklyHours, dayNames, formatPrice, getBookingConfig, type WeekdayHours } from "@/lib/schedule.functions";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -10,6 +10,7 @@ import {
   Check,
   ChevronDown,
   Clock3,
+  CreditCard,
   Heart,
   Instagram,
   MapPin,
@@ -22,7 +23,8 @@ import massageAsset from "@/assets/cuidado-massagem.png.asset.json";
 import cuppingAsset from "@/assets/cuidado-ventosaterapia.png.asset.json";
 import skinCleansingAsset from "@/assets/cuidado-limpeza-pele.png.asset.json";
 import auriculotherapyAsset from "@/assets/cuidado-auriculoterapia.png.asset.json";
-import brighteningAsset from "@/assets/cuidado-clareamento.png.asset.json";
+import drenagemImage from "@/assets/cuidado-drenagem.jpg";
+import browLaminationImage from "@/assets/cuidado-brow-lamination.jpg";
 import logoAsset from "@/assets/logo-nildes-souza.png.asset.json";
 import nildesAsset from "@/assets/nildes-souza-retrato.jpg.asset.json";
 import peelingAsset from "@/assets/cuidado-peeling.png.asset.json";
@@ -53,7 +55,8 @@ const procedures = [
   { name: "Ventosaterapia", tag: "Cuidado corporal", text: "Uma experiência corporal complementar para sua rotina de bem-estar.", image: cuppingAsset.url },
   { name: "Peeling", tag: "Renovação da pele", text: "Cuidado estético para favorecer uma aparência mais uniforme e renovada.", image: peelingAsset.url },
   { name: "Auriculoterapia", tag: "Equilíbrio e cuidado", text: "Uma prática complementar de atenção ao corpo e ao seu momento de cuidado.", image: auriculotherapyAsset.url },
-  { name: "Clareamento de Virilhas, Axilas e Face", tag: "Tom mais uniforme", text: "Cuidado estético para ajudar a uniformizar a aparência da pele e valorizar sua autoestima.", image: brighteningAsset.url },
+  { name: "Drenagem Linfática", tag: "Leveza no corpo", text: "Movimentos suaves que ajudam a reduzir a sensação de inchaço e trazem leveza.", image: drenagemImage },
+  { name: "Brow Lamination", tag: "Sobrancelhas alinhadas", text: "Fios alinhados e um efeito penteado que valoriza o formato natural da sobrancelha.", image: browLaminationImage },
 ] as const;
 
 const fallbackSlots = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] as const;
@@ -82,7 +85,8 @@ const reviews = [
 const faqs = [
   ["Preciso agendar antes de ir?", "Sim. Recomendamos o agendamento para reservar seu horário e oferecer um atendimento tranquilo e personalizado."],
   ["Onde fica a Nildes Souza Estética?", "Rua das Gaivotas, 196, Imbuí Center, Sala 101, ao lado da Subway, em Salvador - BA."],
-  ["Quais procedimentos estão disponíveis?", "Auriculoterapia, design de sobrancelhas, limpeza de pele, peeling, ventosaterapia, massagem relaxante e clareamento de virilhas, axilas e face."],
+  ["Quais procedimentos estão disponíveis?", "Massagens relaxante, modeladora e golden, drenagem linfática, ventosaterapia, limpeza de pele, auriculoterapia, design de sobrancelhas, brow lamination e pacotes com desconto."],
+  ["Como funciona o sinal de 40%?", "Ao agendar, o site mostra o valor do sinal de 40% do procedimento escolhido. O pagamento é feito pelo link do Mercado Pago e o comprovante é enviado no WhatsApp para a clínica confirmar o horário."],
   ["Como funciona o agendamento online?", "Você preenche seus dados, escolhe o tratamento, a data e o horário desejado. A confirmação final é feita pelo WhatsApp."],
   ["Posso agendar mais de um procedimento?", "Sim. Informe os procedimentos desejados nas observações para verificarmos a melhor organização do seu atendimento."],
   ["Como posso entrar em contato?", "Você pode falar conosco pelo WhatsApp ou acompanhar a Nildes Souza Estética no Instagram @nildes.estetica."],
@@ -112,10 +116,21 @@ function Index() {
   const [confirmationUrl, setConfirmationUrl] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+  const [selectedServiceId, setSelectedServiceId] = useState("");
+  const [depositValue, setDepositValue] = useState("");
 
   const fetchBookingConfig = useServerFn(getBookingConfig);
   const { data: bookingConfig } = useQuery({ queryKey: ["booking-config"], queryFn: () => fetchBookingConfig() });
   const weeklyHours = bookingConfig?.weeklyHours ?? defaultWeeklyHours;
+  const services = bookingConfig?.services ?? [];
+  const depositPercent = bookingConfig?.depositPercent ?? 40;
+  const paymentLink = bookingConfig?.paymentLink || defaultPaymentLink;
+  const selectedService = services.find((s) => s.id === selectedServiceId);
+  const groupedServices = useMemo(() => {
+    const groups: Record<string, typeof services> = {};
+    for (const s of services) (groups[s.category] ??= []).push(s);
+    return Object.entries(groups);
+  }, [services]);
   const dayBlocks = useMemo(
     () => (bookingConfig?.blocks ?? []).filter((b) => b.block_date === selectedDate),
     [bookingConfig, selectedDate],
@@ -147,7 +162,14 @@ function Index() {
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") || "");
     const phone = String(form.get("phone") || "");
-    const treatment = String(form.get("treatment") || "");
+    const treatment = selectedService?.name ?? "";
+    const birthdate = String(form.get("birthdate") || "");
+    const email = String(form.get("email") || "");
+    const health = String(form.get("health") || "");
+    const medication = String(form.get("medication") || "");
+    const allergies = String(form.get("allergies") || "");
+    const pregnant = String(form.get("pregnant") || "Não informado");
+    const previous = String(form.get("previous") || "");
     const date = String(form.get("date") || "");
     const time = selectedTime;
     const notes = String(form.get("notes") || "");
@@ -175,10 +197,37 @@ function Index() {
       fail("Esse horário ficou indisponível nesta data. Escolha outro horário.");
       return;
     }
-    const message = `Olá! Quero solicitar um agendamento na Nildes Souza Estética.%0A%0ANome: ${encodeURIComponent(name)}%0ATelefone: ${encodeURIComponent(phone)}%0ATratamento: ${encodeURIComponent(treatment)}%0AData: ${encodeURIComponent(date)}%0AHorário: ${encodeURIComponent(time)}%0AObservações: ${encodeURIComponent(notes || "Nenhuma")}`;
+    if (!selectedService) {
+      fail("Escolha o procedimento desejado.");
+      return;
+    }
+    const deposit = Math.round((selectedService.price_cents * depositPercent) / 100);
+    const lines = [
+      "Olá! Quero solicitar um agendamento na Nildes Souza Estética.",
+      "",
+      `Nome: ${name}`,
+      `Telefone: ${phone}`,
+      email ? `E-mail: ${email}` : "",
+      birthdate ? `Data de nascimento: ${birthdate}` : "",
+      `Procedimento: ${selectedService.name} — ${formatPrice(selectedService.price_cents)}`,
+      `Sinal (${depositPercent}%): ${formatPrice(deposit)}`,
+      `Data: ${date}`,
+      `Horário: ${time}`,
+      "",
+      "Ficha de anamnese:",
+      `Problemas de saúde: ${health || "Nenhum"}`,
+      `Medicamentos em uso: ${medication || "Nenhum"}`,
+      `Alergias: ${allergies || "Nenhuma"}`,
+      `Gestante ou amamentando: ${pregnant}`,
+      `Procedimentos estéticos recentes: ${previous || "Nenhum"}`,
+      `Observações: ${notes || "Nenhuma"}`,
+      "",
+      "Vou enviar o comprovante do sinal para confirmar o horário.",
+    ].filter(Boolean);
     setBookingError("");
     setSubmitted(true);
-    setConfirmationUrl(`https://wa.me/5571981294334?text=${message}`);
+    setDepositValue(formatPrice(deposit));
+    setConfirmationUrl(`https://wa.me/5571981294334?text=${encodeURIComponent(lines.join("\n"))}`);
   }
 
   return <div className="ns-page"><main>
@@ -202,7 +251,7 @@ function Index() {
 
     <section id="duvidas" className="ns-section ns-faq"><div className="ns-container faq-grid"><div><SectionTitle eyebrow="Perguntas frequentes" title="Tudo mais simples antes do seu horário" sub="Confira as respostas para as dúvidas mais comuns." /><Button href="#agendamento">Ainda tenho dúvidas — agendar</Button></div><div className="faq-list">{faqs.map(([question, answer], index) => <div className={`faq-item ${openFaq === index ? "open" : ""}`} key={question}><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} aria-expanded={openFaq === index}><span>{question}</span><ChevronDown size={19} /></button><div className="faq-answer"><p>{answer}</p></div></div>)}</div></div></section>
 
-    <section id="agendamento" className="ns-section ns-booking"><div className="ns-container booking-shell"><div className="booking-intro"><div className="booking-heading"><span className="ns-eyebrow"><CalendarDays size={14} /> Agendamento online</span><h2>Reserve seu momento de <em>cuidado.</em></h2><p>Preencha os dados para solicitar seu horário. Ao finalizar, enviaremos a solicitação pelo WhatsApp para a clínica confirmar.</p></div><aside className="opening-hours" aria-label="Horário de atendimento"><div className="opening-hours-title"><Clock3 size={18} /><div><strong>Horário de atendimento</strong><span>Atualizado pela clínica</span></div></div><div className="opening-hours-list">{[...weeklyHours].sort((a, b) => a.weekday - b.weekday).map((h) => <div className={h.closed ? "closed" : ""} key={h.weekday}><span>{dayNames[h.weekday]}</span><b>{h.closed ? "Fechada" : `${h.start} – ${h.end}`}</b></div>)}</div></aside></div><form className="booking-form" onSubmit={handleSubmit}><div className="form-grid"><label><span>Nome completo</span><input name="name" required placeholder="Digite seu nome" /></label><label><span>Telefone</span><input name="phone" required type="tel" placeholder="(71) 99999-9999" /></label><label><span>Tratamento</span><select name="treatment" required defaultValue=""><option value="" disabled>Selecione um tratamento</option><option>Auriculoterapia</option><option>Design de Sobrancelhas</option><option>Limpeza de Pele</option><option>Peeling</option><option>Ventosaterapia</option><option>Massagem Relaxante</option><option>Clareamento de Virilhas, Axilas e Face</option></select></label><label><span>Data <small>(veja os dias disponíveis)</small></span><input name="date" required type="date" value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); setSelectedTime(""); setBookingError(""); setSubmitted(false); }} /></label></div><div className="form-section-title"><Clock3 size={17} /> Horários disponíveis</div><div className="time-grid">{availableSlots.length ? availableSlots.map((time) => <label key={time}><input type="radio" name="time" value={time} checked={selectedTime === time} onChange={() => setSelectedTime(time)} /><span>{time}</span></label>) : <p className="slots-empty">Não há horários disponíveis nesta data — escolha outra.</p>}</div><label className="full-field"><span>Observações <small>(opcional)</small></span><textarea name="notes" rows={4} placeholder="Conte algo que gostaria que soubéssemos..." /></label>{bookingError && <div className="booking-error" role="alert"><CalendarDays size={18} /><span>{bookingError}</span></div>}<button className="booking-submit" type="submit"><CalendarDays size={18} /> Agendar agora <ArrowRight size={17} /></button><p className="booking-note">O horário só estará reservado após a confirmação da clínica pelo WhatsApp.</p></form></div></section>
+    <section id="agendamento" className="ns-section ns-booking"><div className="ns-container booking-shell"><div className="booking-intro"><div className="booking-heading"><span className="ns-eyebrow"><CalendarDays size={14} /> Agendamento online</span><h2>Reserve seu momento de <em>cuidado.</em></h2><p>Preencha seus dados e a ficha de anamnese para solicitar seu horário. O horário é reservado após o pagamento do sinal de {depositPercent}% e a confirmação da clínica.</p></div><aside className="opening-hours" aria-label="Horário de atendimento"><div className="opening-hours-title"><Clock3 size={18} /><div><strong>Horário de atendimento</strong><span>Atualizado pela clínica</span></div></div><div className="opening-hours-list">{[...weeklyHours].sort((a, b) => a.weekday - b.weekday).map((h) => <div className={h.closed ? "closed" : ""} key={h.weekday}><span>{dayNames[h.weekday]}</span><b>{h.closed ? "Fechada" : `${h.start} – ${h.end}`}</b></div>)}</div></aside></div><form className="booking-form" onSubmit={handleSubmit}><div className="form-grid"><label><span>Nome completo</span><input name="name" required placeholder="Digite seu nome" /></label><label><span>Telefone</span><input name="phone" required type="tel" placeholder="(71) 99999-9999" /></label><label><span>E-mail <small>(opcional)</small></span><input name="email" type="email" placeholder="seuemail@email.com" /></label><label><span>Data de nascimento <small>(opcional)</small></span><input name="birthdate" type="date" /></label><label className="full-field"><span>Procedimento</span><select name="treatment" required value={selectedServiceId} onChange={(e) => { setSelectedServiceId(e.target.value); setBookingError(""); setSubmitted(false); }}><option value="" disabled>Selecione um procedimento</option>{groupedServices.map(([category, list]) => <optgroup label={categoryLabels[category] ?? category} key={category}>{list.map((s) => <option value={s.id} key={s.id}>{s.name} — {formatPrice(s.price_cents)}</option>)}</optgroup>)}</select></label><label><span>Data <small>(veja os dias disponíveis)</small></span><input name="date" required type="date" value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); setSelectedTime(""); setBookingError(""); setSubmitted(false); }} /></label></div>{selectedService && <div className="deposit-box"><div><strong>{selectedService.name}</strong><small>{selectedService.description || "Valor do procedimento"}</small></div><div className="deposit-values"><span>Valor: <b>{formatPrice(selectedService.price_cents)}</b></span><span className="deposit-highlight">Sinal ({depositPercent}%): <b>{formatPrice(Math.round((selectedService.price_cents * depositPercent) / 100))}</b></span></div></div>}<div className="form-section-title"><Clock3 size={17} /> Horários disponíveis</div><div className="time-grid">{availableSlots.length ? availableSlots.map((time) => <label key={time}><input type="radio" name="time" value={time} checked={selectedTime === time} onChange={() => setSelectedTime(time)} /><span>{time}</span></label>) : <p className="slots-empty">Não há horários disponíveis nesta data — escolha outra.</p>}</div><div className="form-section-title"><Heart size={17} /> Ficha de anamnese</div><div className="form-grid"><label><span>Tem algum problema de saúde?</span><input name="health" placeholder="Ex.: pressão alta, diabetes..." /></label><label><span>Usa algum medicamento?</span><input name="medication" placeholder="Ex.: anticoncepcional, anti-inflamatório..." /></label><label><span>Tem alergias?</span><input name="allergies" placeholder="Ex.: alergia a óleos, cosméticos..." /></label><label><span>Está gestante ou amamentando?</span><select name="pregnant" defaultValue="Não"><option>Não</option><option>Sim, gestante</option><option>Sim, amamentando</option></select></label><label className="full-field"><span>Fez algum procedimento estético recente?</span><input name="previous" placeholder="Ex.: peeling há 15 dias" /></label></div><label className="full-field"><span>Observações <small>(opcional)</small></span><textarea name="notes" rows={4} placeholder="Conte algo que gostaria que soubéssemos..." /></label>{bookingError && <div className="booking-error" role="alert"><CalendarDays size={18} /><span>{bookingError}</span></div>}<button className="booking-submit" type="submit"><CalendarDays size={18} /> Agendar agora <ArrowRight size={17} /></button><p className="booking-note">O horário só fica reservado após o pagamento do sinal de {depositPercent}% e a confirmação da clínica pelo WhatsApp.</p></form></div></section>
 
     <section className="ns-final-cta"><div className="ns-container final-inner"><span className="ns-eyebrow"><Sparkles size={14} /> Nildes Souza Estética</span><h2>Seu momento de cuidado <em>começa aqui.</em></h2><p>Tudo o que você precisa para realçar sua beleza.</p><Button href="#agendamento">Agendar meu horário</Button></div></section>
   </main>
@@ -210,6 +259,6 @@ function Index() {
   <footer className="ns-footer"><div className="ns-container footer-grid"><div><Brand /><p>Beleza, cuidado e bem-estar em uma experiência feita para você.</p></div><div><strong>Atalhos</strong><a href="#inicio">Início</a><a href="#sobre">Como funciona</a><a href="#procedimentos">Procedimentos</a><a href="#agendamento">Agendamento</a></div><div><strong>Contato</strong><a href={mapUrl} target="_blank" rel="noreferrer"><MapPin size={15} /> Rua das Gaivotas, 196 — Imbuí Center</a><a href={wa} target="_blank" rel="noreferrer">WhatsApp • (71) 98129-4334</a><a href={instagramUrl} target="_blank" rel="noreferrer"><Instagram size={15} /> @nildes.estetica</a></div></div><div className="ns-container footer-bottom"><span>© {new Date().getFullYear()} Nildes Souza Estética. Todos os direitos reservados.</span><span>Salvador • BA</span></div></footer>
 
   <a className="floating-whatsapp" href={wa} target="_blank" rel="noreferrer" aria-label="Falar com a Nildes Souza Estética pelo WhatsApp"><img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="WhatsApp" /><span>Fale conosco</span></a>
-  {submitted && confirmationUrl && <div className="booking-modal-backdrop" role="presentation"><section className="booking-confirmation" role="dialog" aria-modal="true" aria-labelledby="booking-confirmation-title"><button className="booking-modal-close" type="button" onClick={() => setSubmitted(false)} aria-label="Fechar confirmação"><X size={20} /></button><div className="booking-confirmation-icon"><Check size={27} /></div><span className="ns-eyebrow">Última etapa</span><h2 id="booking-confirmation-title">Confirme seu agendamento</h2><p>Seu horário ainda precisa ser confirmado pela clínica. Clique abaixo para enviar os dados já preenchidos.</p><a className="booking-whatsapp-button" href={confirmationUrl} target="_blank" rel="noreferrer" onClick={() => setSubmitted(false)}><MessageCircle size={20} /> Confirmar no WhatsApp</a></section></div>}
+  {submitted && confirmationUrl && <div className="booking-modal-backdrop" role="presentation"><section className="booking-confirmation" role="dialog" aria-modal="true" aria-labelledby="booking-confirmation-title"><button className="booking-modal-close" type="button" onClick={() => setSubmitted(false)} aria-label="Fechar confirmação"><X size={20} /></button><div className="booking-confirmation-icon"><Check size={27} /></div><span className="ns-eyebrow">Última etapa</span><h2 id="booking-confirmation-title">Pague o sinal e confirme</h2><p>Para reservar seu horário, pague o sinal de <b>{depositValue}</b> ({depositPercent}% do procedimento) e envie o comprovante no WhatsApp com os dados já preenchidos.</p><div className="confirmation-steps"><a className="booking-pay-button" href={paymentLink} target="_blank" rel="noreferrer"><CreditCard size={20} /> 1. Pagar sinal de {depositValue}</a><a className="booking-whatsapp-button" href={confirmationUrl} target="_blank" rel="noreferrer" onClick={() => setSubmitted(false)}><MessageCircle size={20} /> 2. Enviar comprovante no WhatsApp</a></div><small className="confirmation-hint">No link de pagamento, digite o valor do sinal: {depositValue}. O horário é confirmado pela clínica após o comprovante.</small></section></div>}
   </div>;
 }

@@ -19,4 +19,10 @@
 - [x] Mostrar a confirmação do agendamento antes de abrir a mensagem pronta no WhatsApp.
 - [x] Criar área de admin no site (login nildes2026) para editar horários semanais e bloquear dias ou períodos.
 - [x] Fazer o agendamento do site ler os horários e bloqueios salvos no painel.
+- [x] Cadastrar a tabela de valores, com Drenagem Linfática e Brow Lamination, e remover o clareamento.
+- [x] Escolher o procedimento com o valor na hora do agendamento.
+- [x] Acrescentar a ficha de anamnese ao formulário.
+- [x] Mostrar o sinal de 40% e o botão do Mercado Pago antes da confirmação no WhatsApp.
+- [x] Editar procedimentos, valores, porcentagem do sinal e link de pagamento no painel.
+- [ ] Informar o valor do Brow Lamination (hoje está R$ 0,00 no painel).
 - [ ] Integrar o agendamento ao Google Agenda — adiado a pedido da cliente.
