@@ -168,3 +168,29 @@
   .block-check { padding-bottom: 0; }
   .admin-card { padding: 20px; }
 }
+
+/* Procedimentos, sinal e pagamento */
+.admin-card-wide { grid-column: 1 / -1; }
+.services-list { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+.service-row { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,1fr) 150px auto auto; gap: .5rem; align-items: center; padding: .55rem .7rem; border: 1px solid var(--r100); border-radius: 14px; background: #fff; }
+.service-row input[type="text"], .service-row select, .service-price input { width: 100%; padding: .5rem .6rem; border: 1px solid var(--r100); border-radius: 10px; font: inherit; color: var(--r950); background: #fff; }
+.service-price { display: flex; align-items: center; gap: .35rem; }
+.service-price span { color: var(--r950); opacity: .7; font-size: .9rem; }
+.service-active { display: flex; align-items: center; gap: .35rem; font-size: .88rem; color: var(--r950); white-space: nowrap; }
+.new-service { margin-top: 1.4rem; border-top: 1px solid var(--r100); padding-top: 1.2rem; }
+.payment-preview { font-size: .9rem; opacity: .8; }
+.deposit-box { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .8rem; align-items: center; margin: 1rem 0 .4rem; padding: .9rem 1.1rem; border-radius: 16px; background: var(--r100); }
+.deposit-box strong { display: block; color: var(--r950); }
+.deposit-box small { opacity: .75; }
+.deposit-values { display: flex; flex-direction: column; gap: .2rem; text-align: right; font-size: .95rem; color: var(--r950); }
+.deposit-highlight b { color: var(--r950); }
+.confirmation-steps { display: flex; flex-direction: column; gap: .6rem; width: 100%; margin-top: .6rem; }
+.booking-pay-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .95rem 1.4rem; border-radius: 999px; background: var(--r950); color: #fff; font-weight: 600; text-decoration: none; }
+.booking-pay-button:hover { opacity: .92; }
+.confirmation-hint { display: block; margin-top: .8rem; font-size: .82rem; opacity: .75; }
+
+@media (max-width: 760px) {
+  .service-row { grid-template-columns: 1fr 1fr; }
+  .service-row .service-name { grid-column: 1 / -1; }
+  .deposit-values { text-align: left; }
+}
