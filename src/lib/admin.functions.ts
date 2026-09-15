@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { WeekdayHours, ScheduleBlock, Service } from "./schedule.functions";
+import type { WeekdayHours, ScheduleBlock, Service, Appointment } from "./schedule.functions";
 
 type AdminContext = { supabase: import("@supabase/supabase-js").SupabaseClient; userId: string };
 
@@ -162,7 +162,46 @@ export const adminDeleteBlock = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string }) => data)
   .handler(async ({ data, context }): Promise<{ ok: boolean; message?: string }> => {
     if (!(await isAdmin(context))) return { ok: false, message: "Você não tem permissão para isso." };
-    const { error } = await context.supabase.from("schedule_blocks").delete().eq("id", data.id);
-    if (error) return { ok: false, message: "Não foi possível remover o bloqueio." };
+  const { error } = await context.supabase.from("schedule_blocks").delete().eq("id", data.id);
+  if (error) return { ok: false, message: "Não foi possível remover o bloqueio." };
+  return { ok: true };
+});
+
+type AppointmentsResult = { allowed: false } | { allowed: true; appointments: Appointment[] };
+
+export const adminListAppointments = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AppointmentsResult> => {
+    if (!(await isAdmin(context))) return { allowed: false };
+    const { data, error } = await context.supabase
+      .from("appointments")
+      .select("*")
+      .order("appointment_date", { ascending: true })
+      .order("start_time", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) return { allowed: false };
+    return { allowed: true, appointments: (data ?? []) as Appointment[] };
+  });
+
+export const adminSetAppointmentPaid = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string; paid: boolean }) => data)
+  .handler(async ({ data, context }): Promise<{ ok: boolean; message?: string }> => {
+    if (!(await isAdmin(context))) return { ok: false, message: "Você não tem permissão para isso." };
+    const { error } = await context.supabase
+      .from("appointments")
+      .update({ status: data.paid ? "pago" : "pendente" })
+      .eq("id", data.id);
+    if (error) return { ok: false, message: "Não foi possível atualizar o agendamento." };
+    return { ok: true };
+  });
+
+export const adminDeleteAppointment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string }) => data)
+  .handler(async ({ data, context }): Promise<{ ok: boolean; message?: string }> => {
+    if (!(await isAdmin(context))) return { ok: false, message: "Você não tem permissão para isso." };
+    const { error } = await context.supabase.from("appointments").delete().eq("id", data.id);
+    if (error) return { ok: false, message: "Não foi possível remover o agendamento." };
     return { ok: true };
   });
