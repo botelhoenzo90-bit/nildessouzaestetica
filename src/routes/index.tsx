@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { categoryLabels, defaultPaymentLink, defaultWeeklyHours, dayNames, formatPrice, getBookingConfig, type WeekdayHours } from "@/lib/schedule.functions";
+import { categoryLabels, defaultPaymentLink, defaultWeeklyHours, dayNames, formatPrice, getBookingConfig, saveAppointment, type WeekdayHours } from "@/lib/schedule.functions";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -120,6 +120,7 @@ function Index() {
   const [depositValue, setDepositValue] = useState("");
 
   const fetchBookingConfig = useServerFn(getBookingConfig);
+  const saveAppointmentFn = useServerFn(saveAppointment);
   const { data: bookingConfig } = useQuery({ queryKey: ["booking-config"], queryFn: () => fetchBookingConfig() });
   const weeklyHours = bookingConfig?.weeklyHours ?? defaultWeeklyHours;
   const services = bookingConfig?.services ?? [];
@@ -202,6 +203,26 @@ function Index() {
       return;
     }
     const deposit = Math.round((selectedService.price_cents * depositPercent) / 100);
+    // Guarda o pedido no painel da clínica como "pendente" — ela marca como pago quando o comprovante chegar.
+    saveAppointmentFn({
+      data: {
+        name,
+        phone,
+        email: email || null,
+        birthdate: birthdate || null,
+        service_name: selectedService.name,
+        price_cents: selectedService.price_cents,
+        deposit_cents: deposit,
+        appointment_date: date,
+        start_time: time,
+        health: health || null,
+        medication: medication || null,
+        allergies: allergies || null,
+        pregnant,
+        previous: previous || null,
+        notes: notes || null,
+      },
+    }).catch(() => undefined);
     const lines = [
       "Olá! Quero solicitar um agendamento na Nildes Souza Estética.",
       "",

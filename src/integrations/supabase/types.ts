@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          allergies: string | null
+          appointment_date: string
+          birthdate: string | null
+          created_at: string
+          deposit_cents: number
+          email: string | null
+          health: string | null
+          id: string
+          medication: string | null
+          name: string
+          notes: string | null
+          phone: string
+          pregnant: string | null
+          previous: string | null
+          price_cents: number
+          service_name: string
+          start_time: string
+          status: string
+        }
+        Insert: {
+          allergies?: string | null
+          appointment_date: string
+          birthdate?: string | null
+          created_at?: string
+          deposit_cents?: number
+          email?: string | null
+          health?: string | null
+          id?: string
+          medication?: string | null
+          name: string
+          notes?: string | null
+          phone: string
+          pregnant?: string | null
+          previous?: string | null
+          price_cents?: number
+          service_name: string
+          start_time: string
+          status?: string
+        }
+        Update: {
+          allergies?: string | null
+          appointment_date?: string
+          birthdate?: string | null
+          created_at?: string
+          deposit_cents?: number
+          email?: string | null
+          health?: string | null
+          id?: string
+          medication?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string
+          pregnant?: string | null
+          previous?: string | null
+          price_cents?: number
+          service_name?: string
+          start_time?: string
+          status?: string
+        }
+        Relationships: []
+      }
       business_settings: {
         Row: {
           deposit_percent: number
