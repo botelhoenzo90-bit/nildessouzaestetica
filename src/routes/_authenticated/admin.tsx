@@ -330,6 +330,101 @@ function AdminPage() {
               })}
             </div>
           </section>
+
+          <section className="admin-card admin-card-wide">
+            <h2><Tag size={18} /> Procedimentos e valores</h2>
+            <p>Edite o nome, a categoria e o valor de cada procedimento. Desmarque "Ativo" para esconder do agendamento sem apagar.</p>
+            <div className="services-list">
+              {services.map((s) => (
+                <div className="service-row" key={s.id}>
+                  <input
+                    className="service-name"
+                    type="text"
+                    aria-label="Nome do procedimento"
+                    value={s.name}
+                    onChange={(e) => updateService(s.id, { name: e.target.value })}
+                  />
+                  <select
+                    aria-label="Categoria"
+                    value={s.category}
+                    onChange={(e) => updateService(s.id, { category: e.target.value })}
+                  >
+                    <option value="corporal">{categoryLabels["corporal"]}</option>
+                    <option value="facial">{categoryLabels["facial"]}</option>
+                    <option value="pacote">{categoryLabels["pacote"]}</option>
+                  </select>
+                  <div className="service-price">
+                    <span>R$</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      aria-label={`Valor de ${s.name}`}
+                      value={(s.price_cents / 100).toFixed(2)}
+                      onChange={(e) => updateService(s.id, { price_cents: Math.round(Number(e.target.value) * 100) })}
+                    />
+                  </div>
+                  <label className="service-active">
+                    <input type="checkbox" checked={s.active} onChange={(e) => updateService(s.id, { active: e.target.checked })} />
+                    Ativo
+                  </label>
+                  <button className="block-remove" type="button" aria-label={`Remover ${s.name}`} onClick={() => handleDeleteService(s.id)}>
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button className="ns-btn admin-save" type="button" onClick={handleSaveServices}>
+              Salvar procedimentos
+            </button>
+            {servicesMsg && <div className="admin-msg" role="status">{servicesMsg}</div>}
+            {servicesError && <div className="auth-error" role="alert">{servicesError}</div>}
+
+            <form className="block-form new-service" onSubmit={handleAddService}>
+              <div className="row">
+                <label>
+                  <span>Novo procedimento</span>
+                  <input type="text" required placeholder="Ex.: Massagem com pedras" value={newName} onChange={(e) => setNewName(e.target.value)} />
+                </label>
+                <label>
+                  <span>Categoria</span>
+                  <select value={newCategory} onChange={(e) => setNewCategory(e.target.value)}>
+                    <option value="corporal">{categoryLabels["corporal"]}</option>
+                    <option value="facial">{categoryLabels["facial"]}</option>
+                    <option value="pacote">{categoryLabels["pacote"]}</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Valor (R$)</span>
+                  <input type="number" min="0" step="0.01" required value={newPrice} onChange={(e) => setNewPrice(e.target.value)} />
+                </label>
+              </div>
+              <button className="ns-btn" type="submit">Adicionar procedimento</button>
+            </form>
+          </section>
+
+          <section className="admin-card admin-card-wide">
+            <h2><CreditCard size={18} /> Sinal e pagamento</h2>
+            <p>Defina quanto a cliente paga antecipado e o link onde ela faz o pagamento. O site calcula o valor do sinal automaticamente.</p>
+            <div className="row">
+              <label>
+                <span>Sinal (%)</span>
+                <input type="number" min="0" max="100" value={depositPercent} onChange={(e) => setDepositPercent(Number(e.target.value))} />
+              </label>
+              <label className="full-field">
+                <span>Link de pagamento</span>
+                <input type="url" value={paymentLink} onChange={(e) => setPaymentLink(e.target.value)} placeholder="https://link.mercadopago.com.br/..." />
+              </label>
+            </div>
+            <p className="payment-preview">
+              Exemplo: um procedimento de {formatPrice(20000)} pede um sinal de {formatPrice(Math.round((20000 * depositPercent) / 100))}.
+            </p>
+            <button className="ns-btn admin-save" type="button" onClick={handleSavePayment}>
+              Salvar pagamento
+            </button>
+            {paymentMsg && <div className="admin-msg" role="status">{paymentMsg}</div>}
+            {paymentError && <div className="auth-error" role="alert">{paymentError}</div>}
+          </section>
         </div>
       </div>
     </div>
