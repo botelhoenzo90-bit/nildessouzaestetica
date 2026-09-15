@@ -34,6 +34,10 @@ function AdminPage() {
   const saveHoursFn = useServerFn(adminSaveHours);
   const addBlockFn = useServerFn(adminAddBlock);
   const deleteBlockFn = useServerFn(adminDeleteBlock);
+  const saveServicesFn = useServerFn(adminSaveServices);
+  const addServiceFn = useServerFn(adminAddService);
+  const deleteServiceFn = useServerFn(adminDeleteService);
+  const savePaymentFn = useServerFn(adminSavePayment);
 
   const { data, isLoading } = useQuery({ queryKey: ["admin-schedule"], queryFn: () => getSchedule() });
 
@@ -46,6 +50,16 @@ function AdminPage() {
   const [blockStart, setBlockStart] = useState("");
   const [blockEnd, setBlockEnd] = useState("");
   const [blockNote, setBlockNote] = useState("");
+  const [services, setServices] = useState<Service[]>([]);
+  const [servicesMsg, setServicesMsg] = useState("");
+  const [servicesError, setServicesError] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newCategory, setNewCategory] = useState("corporal");
+  const [newPrice, setNewPrice] = useState("");
+  const [depositPercent, setDepositPercent] = useState(40);
+  const [paymentLink, setPaymentLink] = useState("");
+  const [paymentMsg, setPaymentMsg] = useState("");
+  const [paymentError, setPaymentError] = useState("");
 
   useEffect(() => {
     if (data?.allowed && data.weeklyHours.length) {
@@ -54,6 +68,11 @@ function AdminPage() {
       setHours(
         dayNames.map((_, weekday) => ({ weekday, closed: weekday < 2, start: "09:00", end: "18:00" })),
       );
+    }
+    if (data?.allowed) {
+      setServices(data.services);
+      setDepositPercent(data.depositPercent);
+      setPaymentLink(data.paymentLink);
     }
   }, [data]);
 
