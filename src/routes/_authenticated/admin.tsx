@@ -251,6 +251,45 @@ function AdminPage() {
         </div>
 
         <div className="admin-grid">
+          <section className="admin-card admin-card-wide">
+            <h2><CheckCircle2 size={18} /> Agendamentos e pagamentos</h2>
+            <p>Cada agendamento feito no site aparece aqui como "pendente". Quando o comprovante do sinal chegar no WhatsApp, clique em "Marcar pago" para confirmar o horário.</p>
+            <div className="appointments-list">
+              {appointments.length === 0 && (
+                <p className="blocks-empty">Nenhum agendamento solicitado ainda. Eles aparecem aqui automaticamente quando alguém agenda pelo site.</p>
+              )}
+              {appointments.map((a) => {
+                const dateLabel = new Date(`${a.appointment_date}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" });
+                return (
+                  <div className={`appointment-row ${a.status === "pago" ? "paid" : ""}`} key={a.id}>
+                    <div className="appointment-main">
+                      <div className="appointment-head">
+                        <b>{a.name}</b>
+                        <span className={`status-badge ${a.status === "pago" ? "paid" : "pending"}`}>{a.status === "pago" ? "Pago" : "Pendente"}</span>
+                      </div>
+                      <small>
+                        {dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)} às {a.start_time} • {a.service_name} ({formatPrice(a.price_cents)}) • Sinal {formatPrice(a.deposit_cents)}
+                        {a.phone ? <> • <a className="appointment-phone" href={`https://wa.me/55${a.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">{a.phone}</a></> : null}
+                      </small>
+                    </div>
+                    <div className="appointment-actions">
+                      <button
+                        className={a.status === "pago" ? "ns-btn ns-btn-light" : "ns-btn"}
+                        type="button"
+                        onClick={() => handleToggleAppointmentPaid(a.id, a.status !== "pago")}
+                      >
+                        {a.status === "pago" ? "Marcar pendente" : "Marcar pago"}
+                      </button>
+                      <button className="block-remove" type="button" aria-label={`Remover agendamento de ${a.name}`} onClick={() => handleDeleteAppointment(a.id)}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
           <section className="admin-card">
             <h2><Clock3 size={18} /> Horários da semana</h2>
             <p>Marque os dias de atendimento e defina a hora de início e de fim. Ao salvar, o agendamento do site se ajusta na hora.</p>
