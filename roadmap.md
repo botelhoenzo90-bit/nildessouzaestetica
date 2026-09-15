@@ -25,4 +25,4 @@
 - [x] Mostrar o sinal de 40% e o botão do Mercado Pago antes da confirmação no WhatsApp.
 - [x] Editar procedimentos, valores, porcentagem do sinal e link de pagamento no painel.
 - [ ] Informar o valor do Brow Lamination (hoje está R$ 0,00 no painel).
-- [ ] Integrar o agendamento ao Google Agenda — adiado a pedido da cliente.
+- Modelo acordado: agendamento entra na agenda como PENDENTE (cor diferente); no painel ela marca "pago" ao receber o comprovante no WhatsApp e o evento fica confirmado.
