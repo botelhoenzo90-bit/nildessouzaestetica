@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
-import { CalendarDays, CheckCircle2, Clock3, CreditCard, ExternalLink, LogOut, Tag, Trash2 } from "lucide-react";
+import { CalendarDays, Clock3, CreditCard, ExternalLink, LogOut, Tag, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   adminGetSchedule,
@@ -13,11 +13,8 @@ import {
   adminAddService,
   adminDeleteService,
   adminSavePayment,
-  adminListAppointments,
-  adminSetAppointmentPaid,
-  adminDeleteAppointment,
 } from "@/lib/admin.functions";
-import { categoryLabels, dayNames, formatPrice, type Appointment, type Service, type WeekdayHours } from "@/lib/schedule.functions";
+import { categoryLabels, dayNames, formatPrice, type Service, type WeekdayHours } from "@/lib/schedule.functions";
 import logoAsset from "@/assets/logo-nildes-souza.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -41,13 +38,8 @@ function AdminPage() {
   const addServiceFn = useServerFn(adminAddService);
   const deleteServiceFn = useServerFn(adminDeleteService);
   const savePaymentFn = useServerFn(adminSavePayment);
-  const listAppointmentsFn = useServerFn(adminListAppointments);
-  const setAppointmentPaidFn = useServerFn(adminSetAppointmentPaid);
-  const deleteAppointmentFn = useServerFn(adminDeleteAppointment);
 
   const { data, isLoading } = useQuery({ queryKey: ["admin-schedule"], queryFn: () => getSchedule() });
-  const { data: apptData } = useQuery({ queryKey: ["admin-appointments"], queryFn: () => listAppointmentsFn() });
-  const appointments: Appointment[] = apptData?.allowed ? apptData.appointments : [];
 
   const [hours, setHours] = useState<WeekdayHours[]>([]);
   const [saveMsg, setSaveMsg] = useState("");
@@ -197,16 +189,6 @@ function AdminPage() {
     await refreshAll();
   }
 
-  async function handleToggleAppointmentPaid(id: string, paid: boolean) {
-    await setAppointmentPaidFn({ data: { id, paid } });
-    await queryClient.invalidateQueries({ queryKey: ["admin-appointments"] });
-  }
-
-  async function handleDeleteAppointment(id: string) {
-    await deleteAppointmentFn({ data: { id } });
-    await queryClient.invalidateQueries({ queryKey: ["admin-appointments"] });
-  }
-
   async function handleSavePayment() {
     setPaymentError("");
     setPaymentMsg("");
@@ -251,45 +233,6 @@ function AdminPage() {
         </div>
 
         <div className="admin-grid">
-          <section className="admin-card admin-card-wide">
-            <h2><CheckCircle2 size={18} /> Agendamentos e pagamentos</h2>
-            <p>Cada agendamento feito no site aparece aqui como "pendente". Quando o comprovante do sinal chegar no WhatsApp, clique em "Marcar pago" para confirmar o horário.</p>
-            <div className="appointments-list">
-              {appointments.length === 0 && (
-                <p className="blocks-empty">Nenhum agendamento solicitado ainda. Eles aparecem aqui automaticamente quando alguém agenda pelo site.</p>
-              )}
-              {appointments.map((a) => {
-                const dateLabel = new Date(`${a.appointment_date}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" });
-                return (
-                  <div className={`appointment-row ${a.status === "pago" ? "paid" : ""}`} key={a.id}>
-                    <div className="appointment-main">
-                      <div className="appointment-head">
-                        <b>{a.name}</b>
-                        <span className={`status-badge ${a.status === "pago" ? "paid" : "pending"}`}>{a.status === "pago" ? "Pago" : "Pendente"}</span>
-                      </div>
-                      <small>
-                        {dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)} às {a.start_time} • {a.service_name} ({formatPrice(a.price_cents)}) • Sinal {formatPrice(a.deposit_cents)}
-                        {a.phone ? <> • <a className="appointment-phone" href={`https://wa.me/55${a.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">{a.phone}</a></> : null}
-                      </small>
-                    </div>
-                    <div className="appointment-actions">
-                      <button
-                        className={a.status === "pago" ? "ns-btn ns-btn-light" : "ns-btn"}
-                        type="button"
-                        onClick={() => handleToggleAppointmentPaid(a.id, a.status !== "pago")}
-                      >
-                        {a.status === "pago" ? "Marcar pendente" : "Marcar pago"}
-                      </button>
-                      <button className="block-remove" type="button" aria-label={`Remover agendamento de ${a.name}`} onClick={() => handleDeleteAppointment(a.id)}>
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
           <section className="admin-card">
             <h2><Clock3 size={18} /> Horários da semana</h2>
             <p>Marque os dias de atendimento e defina a hora de início e de fim. Ao salvar, o agendamento do site se ajusta na hora.</p>
