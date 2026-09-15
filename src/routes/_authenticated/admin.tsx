@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
-import { CalendarDays, Clock3, ExternalLink, LogOut, Trash2 } from "lucide-react";
+import { CalendarDays, Clock3, CreditCard, ExternalLink, LogOut, Tag, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   adminGetSchedule,
