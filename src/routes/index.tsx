@@ -23,8 +23,8 @@ import massageAsset from "@/assets/cuidado-massagem.png.asset.json";
 import cuppingAsset from "@/assets/cuidado-ventosaterapia.png.asset.json";
 import skinCleansingAsset from "@/assets/cuidado-limpeza-pele.png.asset.json";
 import auriculotherapyAsset from "@/assets/cuidado-auriculoterapia.png.asset.json";
-import drenagemImage from "@/assets/cuidado-drenagem.jpg";
-import browLaminationImage from "@/assets/cuidado-brow-lamination.jpg";
+import drenagemAsset from "@/assets/cuidado-drenagem-linfatica.png.asset.json";
+import browLaminationAsset from "@/assets/cuidado-brow-lamination-nova.png.asset.json";
 import logoAsset from "@/assets/logo-nildes-souza.png.asset.json";
 import nildesAsset from "@/assets/nildes-souza-retrato.jpg.asset.json";
 import peelingAsset from "@/assets/cuidado-peeling.png.asset.json";
@@ -55,8 +55,8 @@ const procedures = [
   { name: "Ventosaterapia", tag: "Cuidado corporal", text: "Uma experiência corporal complementar para sua rotina de bem-estar.", image: cuppingAsset.url },
   { name: "Peeling", tag: "Renovação da pele", text: "Cuidado estético para favorecer uma aparência mais uniforme e renovada.", image: peelingAsset.url },
   { name: "Auriculoterapia", tag: "Equilíbrio e cuidado", text: "Uma prática complementar de atenção ao corpo e ao seu momento de cuidado.", image: auriculotherapyAsset.url },
-  { name: "Drenagem Linfática", tag: "Leveza no corpo", text: "Movimentos suaves que ajudam a reduzir a sensação de inchaço e trazem leveza.", image: drenagemImage },
-  { name: "Brow Lamination", tag: "Sobrancelhas alinhadas", text: "Fios alinhados e um efeito penteado que valoriza o formato natural da sobrancelha.", image: browLaminationImage },
+  { name: "Drenagem Linfática", tag: "Leveza no corpo", text: "Movimentos suaves que ajudam a reduzir a sensação de inchaço e trazem leveza.", image: drenagemAsset.url },
+  { name: "Brow Lamination", tag: "Sobrancelhas alinhadas", text: "Fios alinhados e um efeito penteado que valoriza o formato natural da sobrancelha.", image: browLaminationAsset.url },
 ] as const;
 
 const fallbackSlots = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] as const;
