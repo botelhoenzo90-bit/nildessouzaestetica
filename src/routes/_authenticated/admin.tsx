@@ -4,8 +4,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type FormEvent } from "react";
 import { CalendarDays, Clock3, ExternalLink, LogOut, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { adminGetSchedule, adminAddBlock, adminDeleteBlock, adminSaveHours } from "@/lib/admin.functions";
-import { dayNames, type WeekdayHours } from "@/lib/schedule.functions";
+import {
+  adminGetSchedule,
+  adminAddBlock,
+  adminDeleteBlock,
+  adminSaveHours,
+  adminSaveServices,
+  adminAddService,
+  adminDeleteService,
+  adminSavePayment,
+} from "@/lib/admin.functions";
+import { categoryLabels, dayNames, formatPrice, type Service, type WeekdayHours } from "@/lib/schedule.functions";
 import logoAsset from "@/assets/logo-nildes-souza.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/admin")({

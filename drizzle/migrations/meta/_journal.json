@@ -8,6 +8,13 @@
       "when": 1789427279780,
       "tag": "0000_horarios_e_bloqueios",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789476970152,
+      "tag": "0001_servicos_precos_e_sinal",
+      "breakpoints": true
     }
   ]
 }

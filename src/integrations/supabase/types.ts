@@ -16,17 +16,23 @@ export type Database = {
     Tables: {
       business_settings: {
         Row: {
+          deposit_percent: number
           id: number
+          payment_link: string
           updated_at: string
           weekly_hours: Json
         }
         Insert: {
+          deposit_percent?: number
           id?: number
+          payment_link?: string
           updated_at?: string
           weekly_hours?: Json
         }
         Update: {
+          deposit_percent?: number
           id?: number
+          payment_link?: string
           updated_at?: string
           weekly_hours?: Json
         }
@@ -59,6 +65,39 @@ export type Database = {
           id?: string
           note?: string | null
           start_time?: string | null
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          price_cents: number
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          price_cents?: number
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          price_cents?: number
+          sort_order?: number
         }
         Relationships: []
       }

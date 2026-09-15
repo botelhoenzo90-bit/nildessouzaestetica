@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { WeekdayHours, ScheduleBlock } from "./schedule.functions";
+import type { WeekdayHours, ScheduleBlock, Service } from "./schedule.functions";
 
 type AdminContext = { supabase: import("@supabase/supabase-js").SupabaseClient; userId: string };
 
@@ -12,24 +12,108 @@ async function isAdmin(context: AdminContext): Promise<boolean> {
 const timeRe = /^([01]\d|2[0-3]):[0-5]\d$/;
 const dateRe = /^\d{4}-\d{2}-\d{2}$/;
 
+type AdminSchedule = {
+  allowed: true;
+  weeklyHours: WeekdayHours[];
+  blocks: ScheduleBlock[];
+  services: Service[];
+  depositPercent: number;
+  paymentLink: string;
+};
+
 export const adminGetSchedule = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ allowed: false } | { allowed: true; weeklyHours: WeekdayHours[]; blocks: ScheduleBlock[] }> => {
+  .handler(async ({ context }): Promise<{ allowed: false } | AdminSchedule> => {
     if (!(await isAdmin(context))) return { allowed: false };
     const today = new Date().toISOString().slice(0, 10);
-    const [settingsRes, blocksRes] = await Promise.all([
-      context.supabase.from("business_settings").select("weekly_hours").eq("id", 1).maybeSingle(),
+    const [settingsRes, blocksRes, servicesRes] = await Promise.all([
+      context.supabase.from("business_settings").select("weekly_hours, deposit_percent, payment_link").eq("id", 1).maybeSingle(),
       context.supabase
         .from("schedule_blocks")
         .select("id, block_date, full_day, start_time, end_time, note")
         .gte("block_date", today)
         .order("block_date", { ascending: true }),
+      context.supabase
+        .from("services")
+        .select("id, category, name, description, price_cents, sort_order, active")
+        .order("category", { ascending: true })
+        .order("sort_order", { ascending: true }),
     ]);
     return {
       allowed: true,
       weeklyHours: (settingsRes.data?.weekly_hours as WeekdayHours[] | null) ?? [],
       blocks: (blocksRes.data ?? []) as ScheduleBlock[],
+      services: (servicesRes.data ?? []) as Service[],
+      depositPercent: settingsRes.data?.deposit_percent ?? 40,
+      paymentLink: settingsRes.data?.payment_link ?? "",
     };
+  });
+
+export const adminSaveServices = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { services: Service[] }) => data)
+  .handler(async ({ data, context }): Promise<{ ok: boolean; message?: string }> => {
+    if (!(await isAdmin(context))) return { ok: false, message: "Você não tem permissão para isso." };
+    for (const s of data.services) {
+      if (!s.name.trim()) return { ok: false, message: "Todo procedimento precisa de um nome." };
+      if (!Number.isFinite(s.price_cents) || s.price_cents < 0) return { ok: false, message: `Valor inválido em ${s.name}.` };
+      const { error } = await context.supabase
+        .from("services")
+        .update({
+          name: s.name.trim(),
+          category: s.category,
+          description: s.description?.trim() ? s.description.trim() : null,
+          price_cents: Math.round(s.price_cents),
+          active: s.active,
+        })
+        .eq("id", s.id);
+      if (error) return { ok: false, message: "Não foi possível salvar os procedimentos." };
+    }
+    return { ok: true };
+  });
+
+export const adminAddService = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { name: string; category: string; description: string | null; price_cents: number }) => data)
+  .handler(async ({ data, context }): Promise<{ ok: boolean; message?: string }> => {
+    if (!(await isAdmin(context))) return { ok: false, message: "Você não tem permissão para isso." };
+    if (!data.name.trim()) return { ok: false, message: "Informe o nome do procedimento." };
+    const { error } = await context.supabase.from("services").insert({
+      name: data.name.trim(),
+      category: data.category,
+      description: data.description?.trim() ? data.description.trim() : null,
+      price_cents: Math.max(0, Math.round(data.price_cents)),
+      sort_order: 999,
+    });
+    if (error) return { ok: false, message: "Não foi possível adicionar o procedimento." };
+    return { ok: true };
+  });
+
+export const adminDeleteService = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string }) => data)
+  .handler(async ({ data, context }): Promise<{ ok: boolean; message?: string }> => {
+    if (!(await isAdmin(context))) return { ok: false, message: "Você não tem permissão para isso." };
+    const { error } = await context.supabase.from("services").delete().eq("id", data.id);
+    if (error) return { ok: false, message: "Não foi possível remover o procedimento." };
+    return { ok: true };
+  });
+
+export const adminSavePayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { depositPercent: number; paymentLink: string }) => data)
+  .handler(async ({ data, context }): Promise<{ ok: boolean; message?: string }> => {
+    if (!(await isAdmin(context))) return { ok: false, message: "Você não tem permissão para isso." };
+    const pct = Math.round(data.depositPercent);
+    if (!Number.isFinite(pct) || pct < 0 || pct > 100) return { ok: false, message: "A porcentagem precisa ficar entre 0 e 100." };
+    const link = data.paymentLink.trim();
+    if (link && !/^https?:\/\//.test(link)) return { ok: false, message: "O link de pagamento precisa começar com https://" };
+    const { error } = await context.supabase
+      .from("business_settings")
+      .update({ deposit_percent: pct, payment_link: link, updated_at: new Date().toISOString() })
+      .eq("id", 1);
+    if (error) return { ok: false, message: "Não foi possível salvar o pagamento." };
+    return { ok: true };
   });
 
 export const adminSaveHours = createServerFn({ method: "POST" })
