@@ -46,7 +46,10 @@ const details: Record<string, { intro: string; steps: string[]; note: string }> 
   },
 };
 
-const escapeHtml = (value: string) => value.replace(/[&<>\"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '\"': "&quot;", "'": "&#039;" })[char] || char);
+const escapeHtml = (value: string) => {
+  const replacements: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '\"': "&quot;", "'": "&#039;" };
+  return value.replace(/[&<>\"']/g, (char) => replacements[char] ?? char);
+};
 
 function openProcedureModal(name: string) {
   const item = details[name];
