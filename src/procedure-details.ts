@@ -46,6 +46,29 @@ const details: Record<string, { intro: string; steps: string[]; note: string }> 
   },
 };
 
+const normalize = (value: string) => value.replace(/\s+/g, " ").trim().toLowerCase();
+
+function findProcedureFromTarget(target: HTMLElement): { name: string; card: HTMLElement } | null {
+  let current: HTMLElement | null = target;
+  let depth = 0;
+
+  while (current && current !== document.body && depth < 10) {
+    const heading = current.querySelector?.("h3");
+    const headingText = normalize(heading?.textContent || "");
+
+    for (const name of Object.keys(details)) {
+      if (headingText === normalize(name) || headingText.includes(normalize(name))) {
+        return { name, card: current };
+      }
+    }
+
+    current = current.parentElement;
+    depth += 1;
+  }
+
+  return null;
+}
+
 const escapeHtml = (value: string) => {
   const replacements: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '\"': "&quot;", "'": "&#039;" };
   return value.replace(/[&<>\"']/g, (char) => replacements[char] ?? char);
@@ -99,72 +122,71 @@ function openProcedureModal(name: string) {
   document.addEventListener("keydown", onKey);
 }
 
-function decorateCards() {
-  document.querySelectorAll<HTMLElement>(".procedure-card").forEach((card) => {
-    const title = card.querySelector("h3")?.textContent?.trim();
-    if (!title || !details[title]) return;
-
-    card.setAttribute("tabindex", "0");
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Ver como funciona ${title}`);
-    card.style.cursor = "pointer";
-
-    card.onclick = (event) => {
-      const target = event.target as HTMLElement;
-      if (target.closest("a")) return;
-      openProcedureModal(title);
-    };
-
-    card.onkeydown = (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        openProcedureModal(title);
-      }
-    };
-  });
-}
-
 function initProcedureDetails() {
   if (typeof document === "undefined") return;
+  if (document.getElementById("procedure-detail-styles")) return;
 
-  if (!document.getElementById("procedure-detail-styles")) {
-    const style = document.createElement("style");
-    style.id = "procedure-detail-styles";
-    style.textContent = `
-      .procedure-card{cursor:pointer}
-      .procedure-card:focus-visible{outline:3px solid rgba(201,101,130,.55);outline-offset:4px}
-      body.procedure-modal-open{overflow:hidden}
-      .procedure-detail-backdrop{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:16px;background:rgba(53,37,43,.68);backdrop-filter:blur(9px);opacity:0;transition:opacity .22s ease}
-      .procedure-detail-backdrop.is-visible{opacity:1}
-      .procedure-detail-modal{position:relative;width:min(680px,100%);max-height:calc(100vh - 32px);overflow:hidden;padding:28px clamp(22px,4vw,42px) 24px;border:1px solid rgba(179,77,107,.18);border-radius:28px;background:linear-gradient(145deg,#fffdfc 0%,#fff6f8 100%);box-shadow:0 30px 80px rgba(45,20,30,.28);transform:translateY(14px) scale(.98);transition:transform .25s ease}
-      .procedure-detail-backdrop.is-visible .procedure-detail-modal{transform:translateY(0) scale(1)}
-      .procedure-detail-close{position:absolute;right:14px;top:13px;width:38px;height:38px;border:1px solid rgba(118,36,63,.12);border-radius:50%;background:rgba(255,255,255,.82);color:#76243f;font-size:25px;line-height:1;cursor:pointer;transition:.2s}
-      .procedure-detail-close:hover{transform:rotate(8deg);background:#fff}
-      .procedure-detail-topline{display:flex;align-items:center;gap:8px;color:#b34d6b;font-size:8px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
-      .procedure-detail-topline i{font-style:normal;color:#efb6c4}
-      .procedure-detail-tag{display:inline-flex;margin-top:11px;padding:6px 10px;border-radius:999px;background:#fbedf0;color:#963653;font-size:8px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
-      .procedure-detail-modal h2{max-width:570px;margin-top:10px;color:#5d1d32;font:clamp(30px,4.3vw,45px)/.98 Georgia,"Times New Roman",serif;letter-spacing:-1px}
-      .procedure-detail-intro{max-width:570px;margin-top:11px;color:#76666c;font-size:12.5px;line-height:1.52}
-      .procedure-detail-section{margin-top:18px;padding-top:16px;border-top:1px solid #ead9de}
-      .procedure-detail-label{color:#76243f;font-size:9px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase}
-      .procedure-detail-steps{display:grid;gap:0;margin-top:6px}
-      .procedure-detail-step{display:grid;grid-template-columns:29px 1fr;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid rgba(234,217,222,.75)}
-      .procedure-detail-step:last-child{border-bottom:0}
-      .procedure-detail-step>span{width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:#f5d4dc;color:#76243f;font:10px Georgia,serif}
-      .procedure-detail-step p{padding-top:3px;color:#5e4a51;font-size:11px;line-height:1.42}
-      .procedure-detail-note{display:flex;gap:9px;margin-top:11px;padding:10px 12px;border:1px solid rgba(179,77,107,.13);border-radius:14px;background:rgba(255,255,255,.66)}
-      .procedure-detail-note>span{color:#b34d6b;font-size:11px}
-      .procedure-detail-note p{color:#806d73;font-size:9px;line-height:1.4}
-      .procedure-detail-cta{display:flex;align-items:center;justify-content:center;gap:8px;height:45px;margin-top:13px;padding:0 18px;border-radius:999px;background:#963653;color:#fff;font-size:11px;font-weight:900;box-shadow:0 10px 22px rgba(150,54,83,.18);transition:.2s}
-      .procedure-detail-cta:hover{background:#76243f;transform:translateY(-2px)}
-      @media(max-width:600px){.procedure-detail-backdrop{padding:10px}.procedure-detail-modal{max-height:calc(100vh - 20px);padding:24px 18px 18px;border-radius:22px}.procedure-detail-close{right:10px;top:9px;width:34px;height:34px;font-size:23px}.procedure-detail-topline{font-size:7px}.procedure-detail-tag{margin-top:8px;padding:5px 8px;font-size:7px}.procedure-detail-modal h2{margin-top:8px;font-size:29px}.procedure-detail-intro{margin-top:8px;font-size:11px;line-height:1.45}.procedure-detail-section{margin-top:13px;padding-top:12px}.procedure-detail-step{grid-template-columns:25px 1fr;gap:8px;padding:6px 0}.procedure-detail-step>span{width:22px;height:22px;font-size:9px}.procedure-detail-step p{font-size:10px;line-height:1.35}.procedure-detail-note{margin-top:8px;padding:8px 10px}.procedure-detail-note p{font-size:8px}.procedure-detail-cta{height:42px;margin-top:10px;font-size:10px}}
-    `;
-    document.head.appendChild(style);
-  }
+  const style = document.createElement("style");
+  style.id = "procedure-detail-styles";
+  style.textContent = `
+    .procedure-card{cursor:pointer}
+    .procedure-card:focus-visible{outline:3px solid rgba(201,101,130,.55);outline-offset:4px}
+    body.procedure-modal-open{overflow:hidden}
+    .procedure-detail-backdrop{position:fixed;inset:0;z-index:999999;display:grid;place-items:center;padding:14px;background:rgba(53,37,43,.68);backdrop-filter:blur(9px);opacity:0;transition:opacity .22s ease}
+    .procedure-detail-backdrop.is-visible{opacity:1}
+    .procedure-detail-modal{position:relative;width:min(700px,100%);max-height:calc(100vh - 28px);overflow:hidden;padding:30px clamp(22px,4vw,42px) 26px;border:1px solid rgba(179,77,107,.18);border-radius:28px;background:linear-gradient(145deg,#fffdfc 0%,#fff6f8 100%);box-shadow:0 35px 100px rgba(45,20,30,.3);transform:translateY(10px) scale(.985);transition:transform .25s ease}
+    .procedure-detail-backdrop.is-visible .procedure-detail-modal{transform:translateY(0) scale(1)}
+    .procedure-detail-close{position:absolute;right:15px;top:14px;width:40px;height:40px;border:1px solid rgba(118,36,63,.12);border-radius:50%;background:rgba(255,255,255,.9);color:#76243f;font-size:27px;line-height:1;cursor:pointer;z-index:2}
+    .procedure-detail-topline{display:flex;align-items:center;gap:10px;color:#b34d6b;font-size:9px;font-weight:900;letter-spacing:2.2px;text-transform:uppercase}
+    .procedure-detail-topline i{font-style:normal;color:#efb6c4}
+    .procedure-detail-tag{display:inline-flex;margin-top:12px;padding:6px 10px;border-radius:999px;background:#fbedf0;color:#963653;font-size:8px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+    .procedure-detail-modal h2{max-width:560px;margin-top:10px;color:#5d1d32;font:clamp(30px,4.4vw,46px)/1.02 Georgia,"Times New Roman",serif;letter-spacing:-1px}
+    .procedure-detail-intro{max-width:590px;margin-top:12px;color:#76666c;font-size:13px;line-height:1.55}
+    .procedure-detail-section{margin-top:20px;padding-top:18px;border-top:1px solid #ead9de}
+    .procedure-detail-label{color:#76243f;font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
+    .procedure-detail-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:11px}
+    .procedure-detail-step{padding:13px 12px;border:1px solid rgba(179,77,107,.11);border-radius:16px;background:rgba(255,255,255,.68)}
+    .procedure-detail-step>span{display:grid;place-items:center;width:27px;height:27px;margin-bottom:8px;border-radius:50%;background:#f5d4dc;color:#76243f;font:11px Georgia,serif}
+    .procedure-detail-step p{color:#5e4a51;font-size:11px;line-height:1.5}
+    .procedure-detail-note{display:flex;gap:9px;margin-top:13px;padding:11px 13px;border:1px solid rgba(179,77,107,.13);border-radius:14px;background:rgba(255,255,255,.66)}
+    .procedure-detail-note>span{color:#b34d6b;font-size:12px}
+    .procedure-detail-note p{color:#806d73;font-size:9.5px;line-height:1.45}
+    .procedure-detail-cta{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;margin-top:14px;padding:0 18px;border-radius:999px;background:#963653;color:#fff;font-size:11px;font-weight:900;box-shadow:0 13px 28px rgba(150,54,83,.2);transition:.2s}
+    .procedure-detail-cta:hover{background:#76243f;transform:translateY(-2px)}
+    @media(max-width:650px){.procedure-detail-backdrop{padding:10px}.procedure-detail-modal{max-height:calc(100vh - 20px);padding:27px 18px 20px;border-radius:22px}.procedure-detail-modal h2{font-size:30px}.procedure-detail-intro{font-size:12px}.procedure-detail-steps{grid-template-columns:1fr}.procedure-detail-step{display:grid;grid-template-columns:30px 1fr;gap:9px;align-items:start}.procedure-detail-step>span{margin:0}.procedure-detail-step p{font-size:11px}}
+  `;
+  document.head.appendChild(style);
 
-  decorateCards();
-  const observer = new MutationObserver(decorateCards);
-  observer.observe(document.body, { childList: true, subtree: true });
+  const handleDocumentClick = (event: MouseEvent) => {
+    const target = event.target as HTMLElement | null;
+    if (!target || target.closest(".procedure-detail-backdrop")) return;
+
+    const found = findProcedureFromTarget(target);
+    if (!found) return;
+
+    const link = target.closest("a");
+    if (link && link.getAttribute("href")?.includes("#agendamento")) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    openProcedureModal(found.name);
+  };
+
+  document.addEventListener("click", handleDocumentClick, true);
+
+  const decorate = () => {
+    document.querySelectorAll<HTMLElement>(".procedure-card").forEach((card) => {
+      const found = findProcedureFromTarget(card);
+      if (!found) return;
+      card.style.cursor = "pointer";
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", `Ver como funciona ${found.name}`);
+    });
+  };
+
+  decorate();
+  new MutationObserver(decorate).observe(document.body, { childList: true, subtree: true });
 }
 
 if (typeof document !== "undefined") {
