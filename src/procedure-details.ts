@@ -90,11 +90,37 @@ function openProcedureModal(name: string) {
     if (event.target === backdrop) close();
     if ((event.target as HTMLElement).closest(".procedure-detail-cta")) close();
   });
-  document.addEventListener("keydown", function onKey(event) {
+  const onKey = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
       close();
       document.removeEventListener("keydown", onKey);
     }
+  };
+  document.addEventListener("keydown", onKey);
+}
+
+function decorateCards() {
+  document.querySelectorAll<HTMLElement>(".procedure-card").forEach((card) => {
+    const title = card.querySelector("h3")?.textContent?.trim();
+    if (!title || !details[title]) return;
+
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Ver como funciona ${title}`);
+    card.style.cursor = "pointer";
+
+    card.onclick = (event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest("a")) return;
+      openProcedureModal(title);
+    };
+
+    card.onkeydown = (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openProcedureModal(title);
+      }
+    };
   });
 }
 
@@ -135,25 +161,6 @@ function initProcedureDetails() {
     `;
     document.head.appendChild(style);
   }
-
-  document.addEventListener("click", (event) => {
-    const target = event.target as HTMLElement;
-    const card = target.closest(".procedure-card") as HTMLElement | null;
-    if (!card || target.closest("a")) return;
-    const title = card.querySelector("h3")?.textContent?.trim();
-    if (!title || !details[title]) return;
-    event.preventDefault();
-    openProcedureModal(title);
-  });
-
-  const decorateCards = () => {
-    document.querySelectorAll<HTMLElement>(".procedure-card").forEach((card) => {
-      card.setAttribute("tabindex", "0");
-      card.setAttribute("role", "button");
-      const title = card.querySelector("h3")?.textContent?.trim();
-      if (title) card.setAttribute("aria-label", `Ver como funciona ${title}`);
-    });
-  };
 
   decorateCards();
   const observer = new MutationObserver(decorateCards);
