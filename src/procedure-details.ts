@@ -15,15 +15,10 @@ const details: Record<string, Detail> = {
 const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
 const escapeHtml = (value: string) => value.replace(/[&<>\"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '\"': "&quot;", "'": "&#039;" }[c] || c));
 
-function procedureFromClick(target: Element): string | null {
+function procedureFromCard(card: Element): string | null {
   const names = Object.keys(details);
-  let node: Element | null = target;
-  for (let level = 0; node && level < 12; level++, node = node.parentElement) {
-    const text = normalize((node as HTMLElement).innerText || node.textContent || "");
-    const match = names.find(name => text.includes(normalize(name)));
-    if (match) return match;
-  }
-  return null;
+  const text = normalize((card as HTMLElement).innerText || card.textContent || "");
+  return names.find(name => text.includes(normalize(name))) || null;
 }
 
 function openProcedure(name: string) {
@@ -94,7 +89,9 @@ export function initProcedureDetails() {
   document.addEventListener("click", event => {
     const target = event.target instanceof Element ? event.target : null;
     if (!target || target.closest(".procedure-detail-backdrop")) return;
-    const name = procedureFromClick(target);
+    const card = target.closest(".procedure-card");
+    if (!card) return;
+    const name = procedureFromCard(card);
     if (!name) return;
     event.preventDefault();
     event.stopPropagation();
