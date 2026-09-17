@@ -33,7 +33,7 @@ function openProcedure(name: string) {
 
   const backdrop = document.createElement("div");
   backdrop.className = "procedure-detail-backdrop";
-  backdrop.innerHTML = `<section class="procedure-detail-modal" role="dialog" aria-modal="true">
+  backdrop.innerHTML = `<section class="procedure-detail-modal" role="dialog" aria-modal="true" aria-label="Detalhes de ${escapeHtml(name)}">
     <button class="procedure-detail-close" type="button" aria-label="Fechar">×</button>
     <div class="procedure-detail-topline">CONHEÇA ESTE CUIDADO <b>✦</b></div>
     <span class="procedure-detail-tag">Nildes Souza Estética</span>
@@ -50,7 +50,11 @@ function openProcedure(name: string) {
   document.body.classList.add("procedure-modal-open");
   requestAnimationFrame(() => backdrop.classList.add("is-visible"));
 
-  const close = () => { backdrop.classList.remove("is-visible"); document.body.classList.remove("procedure-modal-open"); setTimeout(() => backdrop.remove(), 180); };
+  const close = () => {
+    backdrop.classList.remove("is-visible");
+    document.body.classList.remove("procedure-modal-open");
+    setTimeout(() => backdrop.remove(), 180);
+  };
   backdrop.querySelector(".procedure-detail-close")?.addEventListener("click", close);
   backdrop.addEventListener("click", e => { if (e.target === backdrop) close(); });
   backdrop.querySelector(".procedure-detail-cta")?.addEventListener("click", close);
@@ -58,8 +62,10 @@ function openProcedure(name: string) {
   document.addEventListener("keydown", esc);
 }
 
-function init() {
+export function initProcedureDetails() {
   if (typeof document === "undefined") return;
+  if ((window as Window & { __nildesProcedureDetails?: boolean }).__nildesProcedureDetails) return;
+  (window as Window & { __nildesProcedureDetails?: boolean }).__nildesProcedureDetails = true;
 
   if (!document.getElementById("procedure-detail-styles")) {
     const style = document.createElement("style");
@@ -70,7 +76,7 @@ function init() {
       .procedure-detail-backdrop.is-visible{opacity:1}
       .procedure-detail-modal{position:relative;width:min(760px,calc(100vw - 24px));padding:28px 34px 24px;border-radius:26px;background:linear-gradient(145deg,#fffdfc,#fff4f7);box-shadow:0 30px 90px rgba(45,20,30,.32);transform:scale(.97);transition:transform .2s ease}
       .procedure-detail-backdrop.is-visible .procedure-detail-modal{transform:scale(1)}
-      .procedure-detail-close{position:absolute;right:14px;top:13px;width:38px;height:38px;border:1px solid #ead9de;border-radius:50%;background:#fff;color:#76243f;font-size:26px;cursor:pointer}
+      .procedure-detail-close{position:absolute;right:14px;top:13px;width:38px;height:38px;border:1px solid #ead9de;border-radius:50%;background:#fff;color:#76243f;font-size:26px;cursor:pointer;z-index:2}
       .procedure-detail-topline{font-size:9px;font-weight:900;letter-spacing:2px;color:#b34d6b}.procedure-detail-topline b{color:#efb6c4}
       .procedure-detail-tag{display:inline-block;margin-top:11px;padding:6px 10px;border-radius:999px;background:#fbedf0;color:#963653;font-size:8px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
       .procedure-detail-modal h2{margin:10px 0 0;color:#5d1d32;font:clamp(30px,4vw,46px)/1.03 Georgia,serif;letter-spacing:-1px}
@@ -79,13 +85,12 @@ function init() {
       .procedure-detail-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
       .procedure-detail-step{padding:12px;border:1px solid #eedfe3;border-radius:15px;background:#fff9fa}.procedure-detail-step strong{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#f5d4dc;color:#76243f;font:11px Georgia,serif}.procedure-detail-step p{margin-top:8px;color:#5e4a51;font-size:11px;line-height:1.5}
       .procedure-detail-note{display:flex;gap:8px;margin-top:12px;padding:10px 12px;border:1px solid #eedfe3;border-radius:13px;background:#fff}.procedure-detail-note b{color:#b34d6b}.procedure-detail-note p{color:#806d73;font-size:9.5px;line-height:1.45}
-      .procedure-detail-cta{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:13px;min-height:45px;border-radius:999px;background:#963653;color:#fff;font-size:11px;font-weight:900}
+      .procedure-detail-cta{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:13px;min-height:45px;border-radius:999px;background:#963653;color:#fff;font-size:11px;font-weight:900;text-decoration:none}
       @media(max-width:650px){.procedure-detail-modal{padding:25px 17px 18px;max-height:calc(100vh - 20px);overflow:auto}.procedure-detail-steps{grid-template-columns:1fr}.procedure-detail-step{display:grid;grid-template-columns:28px 1fr;gap:8px}.procedure-detail-step p{margin:0}.procedure-detail-modal h2{font-size:30px}}
     `;
     document.head.appendChild(style);
   }
 
-  // Capture phase is intentional: cards may be links and the carousel may replace their DOM nodes.
   document.addEventListener("click", event => {
     const target = event.target instanceof Element ? event.target : null;
     if (!target || target.closest(".procedure-detail-backdrop")) return;
@@ -95,9 +100,4 @@ function init() {
     event.stopPropagation();
     openProcedure(name);
   }, true);
-}
-
-if (typeof document !== "undefined") {
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
-  else init();
 }
